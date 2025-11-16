@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+*.log
+!logs/.gitkeep
+coverage
+api.json
+.api-client/*
+!.api-client/package.json
