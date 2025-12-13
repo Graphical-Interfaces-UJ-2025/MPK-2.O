@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { sql } from 'drizzle-orm';
 import { app } from './app';
 import { db } from './config/database.config';
 
@@ -9,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
   try {
     // Test database connection
-    await db.raw('SELECT 1');
+    await db.execute(sql`SELECT 1`);
     console.log('Database connected successfully');
 
     // Start server

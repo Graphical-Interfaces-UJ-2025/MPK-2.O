@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { ILogger, ILoggerToken } from '../modules/shared/application/services/logger.interface';
+import { ILoggerToken } from '../modules/shared/application/services/logger.interface';
 import { WinstonLogger } from '../modules/shared/infrastructure/services/winston-logger.service';
 
 import { IUserRepositoryToken } from '../modules/auth/application/repositories/user.repository.interface';
