@@ -1,0 +1,34 @@
+{
+  "nav": {
+    "about": "ABOUT US",
+    "fleet": "OUR FLEET",
+    "offert": "OFFER",
+    "contact": "CONTACT"
+  },
+  "sections": {
+    "about": "About us",
+    "fleet": "Our fleet",
+    "offer": "Our offer",
+    "contact": "Contact",
+    "welcome": "Welcome to SPININWEST – a professional car rental available 7 days a week! We offer a wide range of modern and well-maintained passenger cars, vans, and luxury vehicles to suit every need. Whether you are looking for a car for a weekend trip, family vacation, business travel, or transporting goods – we are at your disposal."
+  },
+  "offers": {
+    "personalCars": {
+      "title": "Passenger cars",
+      "description": "Perfect for everyday needs, family trips, or business travel. Compact, mid-size, SUVs, station wagons – choose the car that best suits your requirements."
+    },
+    "vans": {
+      "title": "Vans and delivery vehicles",
+      "description": "Need a car for a move or transporting larger loads? Our delivery vehicles and 9-seater vans provide the comfort and space you need."
+    },
+    "business": {
+      "title": "Corporate rentals",
+      "description": "We offer flexible cooperation packages for businesses, including VAT invoicing, individual discounts, and fleet management services."
+    },
+    "premium": {
+      "title": "Premium and wedding cars",
+      "description": "Luxury cars for special occasions: weddings, anniversaries, events. Ensure prestige and elegance on your important day."
+    }
+  },
+  "footer": "© 2025 SPININWEST"
+}

@@ -1,0 +1,56 @@
+@import './base.css';
+
+* {
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+}
+
+html,
+body {
+  font-family: 'Lato', sans-serif;
+  padding: 0;
+  margin: 0;
+  background-color: var(--background-primary);
+}
+
+html.disable-scroll,
+body.disable-scroll {
+  overflow: hidden;
+}
+
+#app {
+  font-family: 'Lato', sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+select {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main);
+  font-size: 20px;
+  width: 55px;
+  height: 45px;
+  background-color: var(--border-color);
+  border-radius: 5px;
+}
+
+select:hover {
+  background-color: var(--background-main);
+  color: var(--text-secondary);
+}
+
+select:focus {
+  background-color: var(--background-main);
+  color: var(--text-secondary);
+}
+
+select:active {
+  background-color: var(--background-main);
+  color: var(--text-secondary);
+}

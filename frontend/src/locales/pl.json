@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "tickets": "BILETY",
+    "lines": "LINIE",
+    "stops": "PRZYSTANKI",
+    "travelPlanner": "PLANER PODRÓŻY",
+    "interactiveMap": "INTERAKTYWNA MAPA",
+    "trains": "TABÓR",
+    "contact": "KONTAKT"
+  },
+  "sections": {
+    "communication": "Komunikaty",
+    "qa": "Częste pytania i odpowiedzi",
+    "map": "Mapa Interaktywna",
+    "offer": "Nasza oferta",
+    "contact": "Kontakt",
+    "welcome": "Witamy na stronie MPK Kraków – przewoźnika publicznego zapewniającego transport zbiorowy dla mieszkańców i turystów. Krakowianka Komunikacja Miejska kursuje 7 dni w tygodniu oferując wygodne, bezpieczne i ekologiczne rozwiązania transportowe dla całej rodziny."
+  },
+  "offers": {
+    "ticketTypes": {
+      "title": "Rodzaje biletów",
+      "description": "Bilety jednorazowe, okresowe, dla studentów i seniorów dostępne w różnych strefach tarifu"
+    },
+    "busRoutes": {
+      "title": "Linie autobusowe",
+      "description": "Ponad 70 linii autobusowych kursujących po Krakowie i okolicach z różną częstotliwością"
+    },
+    "tramRoutes": {
+      "title": "Linie tramwajowe",
+      "description": "24 linie tramwajowe łączące wszystkie dzielnice miasta z nowoczesnym taborem"
+    },
+    "accessibility": {
+      "title": "Dostępność",
+      "description": "Autobusy i tramwaje wyposażone w windy, podjazdy dla osób niepełnosprawnych"
+    },
+    "ecoTransport": {
+      "title": "Transport ekologiczny",
+      "description": "Elektryczne tramwaje i autobusy zmniejszające emisję zanieczyszczeń w mieście"
+    },
+    "mobilityApp": {
+      "title": "Aplikacja mobilna",
+      "description": "Aplikacja MPK pozwala sprawdzić rozkład jazdy, śledzić pojazdy i kupić bilety online"
+    }
+  },
+  "loginButton": "ZALOGUJ SIĘ",
+  "footer": "© 2025 MPK Kraków"
+}

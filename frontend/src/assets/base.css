@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap');
+
+:root {
+  /* Light mode variables */
+  --background-main: #001f3f;
+  --background-primary: #ffffff;
+  --background-secondary: #ffffff;
+  --background-tertiary: #ffffff;
+  --background-additional: #ededed;
+
+  --text-main: #001f3f;
+  --text-primary: #001f3f;
+  --text-secondary: #ffffff;
+  --text-additional: #bebebe;
+
+  --text-positive: #00a300;
+  --text-negative: #ff0000;
+
+  --card-background: #ffffff;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  --input-valid-background: #ffffa9;
+
+  --blocked-button: #bebebe;
+
+  --border-color: #dddddd;
+
+  --navbar-border: #ffffff;
+
+  --header-bg: #ffffff;
+  --header-shadow: #cfcfcf;
+}
+
+[data-theme='dark'] {
+  /* Dark mode variables */
+  --background-main: #282828;
+  --background-primary: #121212;
+  --background-secondary: #282828;
+  --background-tertiary: #3f3f3f;
+  --background-additional: #2d2d2d;
+
+  --text-main: #e9e9e9;
+  --text-primary: #e9e9e9;
+  --text-secondary: #e9e9e9;
+  --text-additional: #cccccc;
+
+  --card-background: #2d2d2d;
+  --card-shadow: rgba(0, 0, 0, 0);
+
+  --shadow-color: rgba(0, 0, 0, 0);
+
+  --input-valid-background: #cece7b;
+
+  --blocked-button: rgba(0, 0, 0, 0.15);
+
+  --border-color: #444444;
+
+  --navbar-border: #3f3f3f;
+
+  --header-bg: #1a1a1a;
+  --header-shadow: rgba(0, 0, 0, 0.2);
+}
