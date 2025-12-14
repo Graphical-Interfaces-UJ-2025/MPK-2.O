@@ -13,8 +13,8 @@ export class UserRepository implements IUserRepository {
     return record ? UserMapper.toDomain(record) : null;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    const [record] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  async findByPesel(pesel: string): Promise<User | null> {
+    const [record] = await db.select().from(users).where(eq(users.pesel, pesel)).limit(1);
     return record ? UserMapper.toDomain(record) : null;
   }
 

@@ -5,8 +5,14 @@ import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.config';
 import { router } from './modules/shared/infrastructure/routes';
+import {
+  createAuthMiddleware,
+  ProtectedRouteConfig,
+} from './modules/shared/infrastructure/middlewares';
 import './container'; // Initialize DI container
 import { writeFileSync } from 'fs';
+
+const protectedRoutes: ProtectedRouteConfig[] = [{ path: '/api/auth/me', methods: ['GET'] }];
 
 const app: Express = express();
 
@@ -14,6 +20,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(createAuthMiddleware(protectedRoutes));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

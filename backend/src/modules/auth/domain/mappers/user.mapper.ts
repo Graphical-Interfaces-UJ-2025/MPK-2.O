@@ -5,24 +5,30 @@ export class UserMapper {
   static toDomain(record: UserRecord): User {
     return new User(
       record.id,
-      record.email,
+      record.pesel,
       record.passwordHash,
+      record.passwordSalt,
       record.firstName,
       record.lastName,
+      record.role,
       record.createdAt,
-      record.updatedAt
+      record.updatedAt,
+      record.deletedAt
     );
   }
 
   static toPersistence(user: User): NewUserRecord {
     return {
       id: user.id,
-      email: user.email,
+      pesel: user.pesel,
       passwordHash: user.passwordHash,
+      passwordSalt: user.passwordSalt,
       firstName: user.firstName,
       lastName: user.lastName,
+      role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      deletedAt: user.deletedAt,
     };
   }
 }

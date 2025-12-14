@@ -1,12 +1,17 @@
+export type UserRole = 'admin' | 'user' | 'application_manager';
+
 export class User {
   constructor(
     public readonly id: string,
-    public readonly email: string,
+    public readonly pesel: string,
     public readonly passwordHash: string,
+    public readonly passwordSalt: string,
     public readonly firstName: string,
     public readonly lastName: string,
+    public readonly role: UserRole,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date
+    public readonly updatedAt: Date,
+    public readonly deletedAt: Date | null = null
   ) {}
 
   get fullName(): string {
@@ -15,11 +20,24 @@ export class User {
 
   static create(
     id: string,
-    email: string,
+    pesel: string,
     passwordHash: string,
+    passwordSalt: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    role: UserRole = 'user'
   ): User {
-    return new User(id, email, passwordHash, firstName, lastName, new Date(), new Date());
+    return new User(
+      id,
+      pesel,
+      passwordHash,
+      passwordSalt,
+      firstName,
+      lastName,
+      role,
+      new Date(),
+      new Date(),
+      null
+    );
   }
 }
