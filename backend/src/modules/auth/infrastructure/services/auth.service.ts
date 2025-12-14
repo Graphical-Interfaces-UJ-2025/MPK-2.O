@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { IAuthService } from '../../application/services/auth.service.interface';
+import { IAuthService, HashResult } from '../../application/services/auth.service.interface';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
 
 @injectable()
@@ -15,9 +15,11 @@ export class AuthService implements IAuthService {
     this.logger = logger.child('AuthService');
   }
 
-  async hashPassword(password: string): Promise<string> {
+  async hashPassword(password: string): Promise<HashResult> {
     this.logger.debug('Hashing password');
-    return bcrypt.hash(password, this.saltRounds);
+    const salt = await bcrypt.genSalt(this.saltRounds);
+    const hash = await bcrypt.hash(password, salt);
+    return { hash, salt };
   }
 
   async comparePassword(password: string, hash: string): Promise<boolean> {

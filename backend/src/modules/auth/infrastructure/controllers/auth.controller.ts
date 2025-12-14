@@ -5,6 +5,7 @@ import { LoginUserUseCase } from '../../application/use-cases/login-user.use-cas
 import { GetCurrentUserUseCase } from '../../application/use-cases/get-current-user.use-case';
 import { RegisterUserDto } from '../../application/dto/register-user.dto';
 import { LoginUserDto } from '../../application/dto/login-user.dto';
+import { RequestWithUserInfo } from '../../../shared/infrastructure/middlewares';
 
 export const AuthControllerToken = Symbol('AuthControllerToken');
 
@@ -29,19 +30,24 @@ export class AuthController {
    *           schema:
    *             type: object
    *             required:
-   *               - email
+   *               - pesel
    *               - password
    *               - firstName
    *               - lastName
    *             properties:
-   *               email:
+   *               pesel:
    *                 type: string
+   *                 description: Polish national identification number (11 digits)
    *               password:
    *                 type: string
    *               firstName:
    *                 type: string
    *               lastName:
    *                 type: string
+   *               role:
+   *                 type: string
+   *                 enum: [admin, user, application_manager]
+   *                 default: user
    *     responses:
    *       201:
    *         description: User successfully registered
@@ -50,18 +56,19 @@ export class AuthController {
    */
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password, firstName, lastName } = req.body;
+      const { pesel, password, firstName, lastName, role } = req.body;
 
-      const dto = new RegisterUserDto(email, password, firstName, lastName);
+      const dto = new RegisterUserDto(pesel, password, firstName, lastName, role);
       const user = await this.registerUserUseCase.execute(dto);
 
       res.status(201).json({
         success: true,
         data: {
           id: user.id,
-          email: user.email,
+          pesel: user.pesel,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
         },
       });
     } catch (error) {
@@ -85,12 +92,12 @@ export class AuthController {
    *           schema:
    *             type: object
    *             required:
-   *               - email
+   *               - pesel
    *               - password
    *             properties:
-   *               email:
+   *               pesel:
    *                 type: string
-   *                 format: email
+   *                 description: Polish national identification number (11 digits)
    *               password:
    *                 type: string
    *     responses:
@@ -111,11 +118,13 @@ export class AuthController {
    *                       properties:
    *                         id:
    *                           type: string
-   *                         email:
+   *                         pesel:
    *                           type: string
    *                         firstName:
    *                           type: string
    *                         lastName:
+   *                           type: string
+   *                         role:
    *                           type: string
    *                     token:
    *                       type: string
@@ -124,9 +133,9 @@ export class AuthController {
    */
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password } = req.body;
+      const { pesel, password } = req.body;
 
-      const dto = new LoginUserDto(email, password);
+      const dto = new LoginUserDto(pesel, password);
       const { user, token } = await this.loginUserUseCase.execute(dto);
 
       res.status(200).json({
@@ -134,9 +143,10 @@ export class AuthController {
         data: {
           user: {
             id: user.id,
-            email: user.email,
+            pesel: user.pesel,
             firstName: user.firstName,
             lastName: user.lastName,
+            role: user.role,
           },
           token,
         },
@@ -172,36 +182,30 @@ export class AuthController {
    *                   properties:
    *                     id:
    *                       type: string
-   *                     email:
+   *                     pesel:
    *                       type: string
    *                     firstName:
    *                       type: string
    *                     lastName:
+   *                       type: string
+   *                     role:
    *                       type: string
    *       401:
    *         description: Unauthorized - Invalid or missing token
    */
   async getMe(req: Request, res: Response): Promise<void> {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        res.status(401).json({
-          success: false,
-          message: 'Authorization token required',
-        });
-        return;
-      }
-
-      const token = authHeader.substring(7);
-      const user = await this.getCurrentUserUseCase.execute(token);
+      const { user: authUser } = req as RequestWithUserInfo;
+      const user = await this.getCurrentUserUseCase.execute(authUser.id);
 
       res.status(200).json({
         success: true,
         data: {
           id: user.id,
-          email: user.email,
+          pesel: user.pesel,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
         },
       });
     } catch (error) {

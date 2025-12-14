@@ -23,25 +23,25 @@ export class LoginUserUseCase {
   }
 
   async execute(dto: LoginUserDto): Promise<LoginResult> {
-    this.logger.info('Attempting to login user', { email: dto.email });
+    this.logger.info('Attempting to login user', { pesel: dto.pesel });
 
-    const user = await this.userRepository.findByEmail(dto.email);
+    const user = await this.userRepository.findByPesel(dto.pesel);
     if (!user) {
-      this.logger.warn('Login failed: User not found', { email: dto.email });
-      throw new Error('Invalid email or password');
+      this.logger.warn('Login failed: User not found', { pesel: dto.pesel });
+      throw new Error('Invalid PESEL or password');
     }
 
     const isPasswordValid = await this.authService.comparePassword(dto.password, user.passwordHash);
     if (!isPasswordValid) {
-      this.logger.warn('Login failed: Invalid password', { email: dto.email });
-      throw new Error('Invalid email or password');
+      this.logger.warn('Login failed: Invalid password', { pesel: dto.pesel });
+      throw new Error('Invalid PESEL or password');
     }
 
     const token = this.authService.generateToken(user.id);
 
     this.logger.info('User logged in successfully', {
       userId: user.id,
-      email: user.email,
+      pesel: user.pesel,
     });
 
     return { user, token };

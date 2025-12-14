@@ -1,6 +1,6 @@
 export class LoginUserDto {
   constructor(
-    public readonly email: string,
+    public readonly pesel: string,
     public readonly password: string
   ) {}
 }

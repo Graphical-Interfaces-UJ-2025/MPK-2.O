@@ -19,6 +19,10 @@
     "api-client:generate": "npm run open-api:generate && openapi --useOptions --useUnionTypes --input ./api.json --output ./.api-client --name ApiClient",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "imports": {
+    "#modules/*": "./src/modules/*",
+    "#shared/*": "./src/modules/shared/*"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
