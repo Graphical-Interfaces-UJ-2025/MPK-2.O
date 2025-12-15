@@ -5,7 +5,7 @@ import Text from '@/components/Home/Text.vue';
 import Contact from '@/components/Home/Contact.vue';
 import CardsSlider from '@/components/Home/CardsSlider.vue';
 import Cards from '@/components/Home/Cards.vue';
-import Car from '@/components/InfoPopUp/Car.vue';
+import Car from '@/components/InfoPopUp/Announcement.vue';
 
 import { ref, onMounted, computed, markRaw } from 'vue';
 import { useI18n } from 'vue-i18n';

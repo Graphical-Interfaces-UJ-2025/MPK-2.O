@@ -5,85 +5,113 @@ defineProps({
 </script>
 
 <template>
-  <div class="car-details">
-    <div class="car-gallery">
+  <div class="communication-details">
+    <div class="communication-header">
+      <div class="header-icon" v-if="data.icon">
+        <i :class="data.icon"></i>
+      </div>
+      <div class="header-content">
+        <h2>{{ data.title || 'Komunikat' }}</h2>
+        <p class="communication-type" v-if="data.type">{{ data.type }}</p>
+      </div>
+    </div>
+
+    <div class="communication-media" v-if="data.img">
       <div class="main-image">
         <img :src="data.img.src" :alt="data.img.alt" />
       </div>
       <div class="thumbnails" v-if="data.gallery && data.gallery.length">
         <div v-for="(image, index) in data.gallery" :key="index" class="thumbnail">
-          <img :src="image.src" :alt="image.alt || 'Car image'" />
+          <img :src="image.src" :alt="image.alt || 'Media'" />
         </div>
       </div>
     </div>
 
-    <div class="car-info">
-      <div class="car-specs">
-        <div class="spec-item">
-          <i class="fa-solid fa-calendar"></i>
-          <span>Rok produkcji: {{ data.year || 'Nie podano' }}</span>
+    <div class="communication-content">
+      <div class="content-section">
+        <div class="communication-body">
+          <h3>Szczegóły</h3>
+          <p>{{ data.description || 'Brak szczegółów.' }}</p>
         </div>
-        <div class="spec-item">
-          <i class="fa-solid fa-gauge-high"></i>
-          <span>Przebieg: {{ data.mileage || 'Nie podano' }} km</span>
+
+        <div class="communication-meta" v-if="data.metadata && Object.keys(data.metadata).length">
+          <h3>Informacje dodatkowe</h3>
+          <div class="meta-grid">
+            <div v-for="(value, key) in data.metadata" :key="key" class="meta-item">
+              <span class="meta-label">{{ key }}:</span>
+              <span class="meta-value">{{ value }}</span>
+            </div>
+          </div>
         </div>
-        <div class="spec-item">
-          <i class="fa-solid fa-gas-pump"></i>
-          <span>Paliwo: {{ data.fuel || 'Nie podano' }}</span>
-        </div>
-        <div class="spec-item">
-          <i class="fa-solid fa-car"></i>
-          <span>Nadwozie: {{ data.bodyType || 'Nie podano' }}</span>
-        </div>
-        <div class="spec-item">
-          <i class="fa-solid fa-gears"></i>
-          <span>Skrzynia biegów: {{ data.transmission || 'Nie podano' }}</span>
-        </div>
-        <div class="spec-item">
-          <i class="fa-solid fa-horse"></i>
-          <span>Moc: {{ data.power || 'Nie podano' }} KM</span>
+
+        <div class="communication-tags" v-if="data.tags && data.tags.length">
+          <h3>Tagi</h3>
+          <div class="tags-container">
+            <span v-for="(tag, index) in data.tags" :key="index" class="tag">
+              {{ tag }}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="car-description">
-        <h3>Opis</h3>
-        <p>{{ data.description || 'Brak opisu pojazdu.' }}</p>
-      </div>
-
-      <div class="car-features" v-if="data.features && data.features.length">
-        <h3>Wyposażenie</h3>
-        <ul>
-          <li v-for="(feature, index) in data.features" :key="index">
-            <i class="fa-solid fa-check"></i>
-            {{ feature }}
-          </li>
-        </ul>
-      </div>
-
-      <div class="car-price">
-        <div class="rating-tag">
-          <i class="fa-solid fa-star"></i>
-          <span class="price-value">{{ data.rating || 'Nie podano' }}</span>
+      <div class="communication-footer">
+        <div class="status-info" v-if="data.status">
+          <span class="status-badge" :class="'status-' + data.status.toLowerCase()">
+            {{ data.status }}
+          </span>
         </div>
-        <button class="purchase-btn">
-          <i class="fa-solid fa-shopping-cart"></i>
-          Zamów
-        </button>
+        <div class="action-buttons" v-if="data.actions && data.actions.length">
+          <button v-for="(action, index) in data.actions" :key="index" class="action-btn"
+            :class="'action-' + action.type">
+            <i v-if="action.icon" :class="action.icon"></i>
+            {{ action.label }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.car-details {
+.communication-details {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 25px;
   width: 100%;
   padding: 5vh 0;
 }
 
-.car-gallery {
+.communication-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background-color: var(--background-secondary);
+  border-radius: 10px;
+  border-left: 4px solid var(--background-main);
+}
+
+.header-icon {
+  font-size: 28px;
+  color: var(--background-main);
+  width: 40px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.header-content h2 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--text-main);
+}
+
+.communication-type {
+  margin: 5px 0 0 0;
+  font-size: 14px;
+  color: var(--text-additional);
+}
+
+.communication-media {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -93,6 +121,7 @@ defineProps({
   width: 100%;
   border-radius: 10px;
   overflow: hidden;
+  max-height: 400px;
 }
 
 .main-image img {
@@ -117,10 +146,12 @@ defineProps({
   flex-shrink: 0;
   cursor: pointer;
   transition: transform 0.2s;
+  border: 2px solid transparent;
 }
 
 .thumbnail:hover {
   transform: scale(1.05);
+  border-color: var(--background-main);
 }
 
 .thumbnail img {
@@ -129,153 +160,195 @@ defineProps({
   object-fit: cover;
 }
 
-.car-info {
+.communication-content {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
 }
 
-.car-specs {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-  background-color: var(--background-secondary);
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.spec-item {
+.content-section {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.spec-item i {
-  color: var(--background-main);
-  font-size: 18px;
-  width: 24px;
-  text-align: center;
-}
-
-.car-description {
+.communication-body {
   text-align: left;
 }
 
-.car-description h3,
-.car-features h3 {
-  font-size: 22px;
-  margin-bottom: 15px;
+.communication-body h3,
+.communication-meta h3,
+.communication-tags h3 {
+  font-size: 18px;
+  margin: 0 0 12px 0;
   color: var(--text-main);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
 }
 
-.car-description p {
+.communication-body p {
   line-height: 1.6;
   color: var(--text-additional);
+  margin: 0;
 }
 
-.car-features ul {
+.meta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-  list-style-type: none;
-  padding: 0;
-}
-
-.car-features li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-align: left;
-}
-
-.car-features li i {
-  color: var(--text-positive);
-}
-
-.car-price {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 12px;
   background-color: var(--background-secondary);
-  padding: 20px;
-  border-radius: 10px;
-  margin-top: 10px;
+  padding: 15px;
+  border-radius: 8px;
 }
 
-.rating-tag {
+.meta-item {
   display: flex;
-  align-items: center;
-  flex-direction: row;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.rating-tag i {
-  color: #f1c40f;
-  font-size: 22px;
-  margin-right: 5px;
-}
-
-.price-label {
-  font-size: 16px;
+.meta-label {
+  font-size: 12px;
   color: var(--text-additional);
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.price-value {
-  font-size: 28px;
-  font-weight: 700;
+.meta-value {
+  font-size: 14px;
   color: var(--text-main);
 }
 
-.purchase-btn {
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  display: inline-block;
+  background-color: var(--background-main);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.communication-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.status-info {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-success {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.status-warning {
+  background-color: #f39c12;
+  color: white;
+}
+
+.status-error {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.status-info {
+  background-color: #3498db;
+  color: white;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
   background-color: var(--background-main);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 25px;
-  font-size: 16px;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  white-space: nowrap;
 }
 
-.purchase-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-primary {
+  background-color: var(--background-main);
+}
+
+.action-secondary {
+  background-color: var(--text-additional);
+}
+
+.action-danger {
+  background-color: #e74c3c;
 }
 
 @media (min-width: 768px) {
-  .car-details {
+  .communication-details {
     flex-direction: row;
     align-items: flex-start;
   }
 
-  .car-gallery {
-    flex: 1;
-    max-width: 50%;
+  .communication-media {
+    flex: 0 0 45%;
   }
 
-  .car-info {
+  .communication-content {
     flex: 1;
-    padding-left: 30px;
+    padding-left: 20px;
+  }
+
+  .communication-footer {
+    flex-direction: row;
   }
 }
 
 @media (max-width: 767px) {
-  .car-price {
+  .communication-footer {
     flex-direction: column;
-    gap: 15px;
   }
 
-  .price-tag {
-    margin-bottom: 10px;
-  }
-
-  .purchase-btn {
+  .action-buttons {
     width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
     justify-content: center;
   }
 }

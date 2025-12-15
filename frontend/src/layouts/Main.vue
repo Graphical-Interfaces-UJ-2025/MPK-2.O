@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import NavBarButton from '@/components/NavBarButton.vue';
 import SpecialButton from '@/components/Home/SpecialButton.vue';
 import NavBarButtonDropdown from '@/components/NavBarButtonDropdown.vue';
+import Communication from '@/components/InfoPopUp/Announcement.vue';
 
 const { t, locale } = useI18n();
 
