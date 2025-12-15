@@ -20,7 +20,7 @@ defineProps({
 
     <div class="announcement-body">
       <img v-if="data.img" :src="data.img.src" :alt="data.img.alt" class="announcement-image" />
-      
+
       <div class="announcement-content">
         <p class="announcement-description">{{ data.description }}</p>
 
