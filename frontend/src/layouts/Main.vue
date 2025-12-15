@@ -76,7 +76,7 @@ onMounted(() => {
         </div>
       </div>
     </header>
-    <nav>
+    <nav :class="{ active: navBarDropdown }">
       <div class="nav-links">
         <router-link v-for="(page, index) in pages" v-bind:key="index" :to="{ path: page.path, hash: page.hash }">
           <NavBarButton :title="page.label" />
@@ -115,6 +115,7 @@ header {
   padding: 0 10px;
   transition: all 1s ease;
   overflow: hidden;
+  border-bottom: 2px solid var(--background-main);
 }
 
 .header-content {
@@ -127,8 +128,6 @@ nav {
   background-color: var(--background-main);
   color: var(--text-primary);
   width: 100%;
-  max-height: 100px;
-  padding: 15px 10px;
   transition: all 1s ease;
   overflow: hidden;
   border-bottom: 2px solid var(--navbar-border);
@@ -136,6 +135,7 @@ nav {
 
 nav.active {
   max-height: 1000px;
+  padding: 15px 10px;
 }
 
 .logo {
@@ -168,14 +168,6 @@ nav.active {
   flex: 1;
   justify-content: flex-end;
   gap: 15px;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 15%;
-  gap: 25px;
 }
 
 .settings {
@@ -286,7 +278,7 @@ nav.active {
   font-size: 25px;
   transition: all 0.3s ease;
   cursor: pointer;
-  width: 80px;
+  width: 50px;
   height: 80px;
   transition: all 0.3s ease;
   color: var(--text-primary);
@@ -355,7 +347,22 @@ footer::before {
 }
 
 @media (max-width: 1250px) {
+  .nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 15px;
+  }
 
+  .settings {
+    display: none;
+  }
+
+  nav {
+    max-height: 0px;
+    padding: 0 10px;
+  }
 
   .phone {
     display: flex;
@@ -363,6 +370,22 @@ footer::before {
 }
 
 @media (min-width: 1250px) {
+  .nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15%;
+    gap: 25px;
+  }
+
+  nav {
+    max-height: 100px;
+    padding: 15px 10px;
+  }
+
+  .settings {
+    display: flex;
+  }
 
   .phone {
     display: none;
