@@ -13,7 +13,7 @@ export default defineConfig({
     database: process.env.DB_NAME || 'transport_system',
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
-    ssl: process.env.NODE_ENV === 'production',
+    ssl: true,
   },
   verbose: true,
   strict: true,

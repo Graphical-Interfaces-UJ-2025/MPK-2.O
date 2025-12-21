@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { container } from '../../../../container';
 import { AuthController } from '../controllers/auth.controller';
+import { container } from 'tsyringe';
 
 const router = Router();
-const authController = container.resolve<AuthController>(AuthController);
+
+const authController: AuthController = container.resolve(AuthController);
 
 router.post('/register', (req, res) => authController.register(req, res));
 router.post('/login', (req, res) => authController.login(req, res));

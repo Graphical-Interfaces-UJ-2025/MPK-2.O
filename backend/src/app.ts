@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import './container'; // Initialize DI container
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -8,11 +8,21 @@ import { router } from './modules/shared/infrastructure/routes';
 import {
   createAuthMiddleware,
   ProtectedRouteConfig,
+  createRoleMiddleware,
+  RoleProtectedRouteConfig,
 } from './modules/shared/infrastructure/middlewares';
-import './container'; // Initialize DI container
 import { writeFileSync } from 'fs';
 
-const protectedRoutes: ProtectedRouteConfig[] = [{ path: '/api/auth/me', methods: ['GET'] }];
+const protectedRoutes: ProtectedRouteConfig[] = [
+  { path: '/api/auth/me', methods: ['GET'] },
+  { path: '/api/tickets', methods: ['*'] },
+];
+
+const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
+  { path: '/api/tickets/orders-history', methods: ['GET'], roles: ['user'] },
+  { path: '/api/tickets', methods: ['POST'], roles: ['admin', 'application_manager'] },
+  { path: '/api/tickets/', methods: ['DELETE'], roles: ['admin', 'application_manager'] },
+];
 
 const app: Express = express();
 
@@ -21,6 +31,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(createAuthMiddleware(protectedRoutes));
+app.use(createRoleMiddleware(roleProtectedRoutes));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
