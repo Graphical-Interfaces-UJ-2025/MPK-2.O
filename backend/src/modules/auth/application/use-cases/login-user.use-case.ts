@@ -2,11 +2,9 @@ import { inject, injectable } from 'tsyringe';
 import { IUserRepository, IUserRepositoryToken } from '../repositories/user.repository.interface';
 import { IAuthService, IAuthServiceToken } from '../services/auth.service.interface';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
-import { User } from '../../domain/entities/user.entity';
 import { LoginUserDto } from '../dto/login-user.dto';
 
 export interface LoginResult {
-  user: User;
   token: string;
 }
 
@@ -44,6 +42,6 @@ export class LoginUserUseCase {
       pesel: user.pesel,
     });
 
-    return { user, token };
+    return { token };
   }
 }

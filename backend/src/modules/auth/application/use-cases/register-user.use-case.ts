@@ -5,6 +5,7 @@ import { IAuthService, IAuthServiceToken } from '../services/auth.service.interf
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
 import { User } from '../../domain/entities/user.entity';
 import { RegisterUserDto } from '../dto/register-user.dto';
+import { LoginResult } from './login-user.use-case';
 
 @injectable()
 export class RegisterUserUseCase {
@@ -18,7 +19,7 @@ export class RegisterUserUseCase {
     this.logger = logger.child('RegisterUserUseCase');
   }
 
-  async execute(dto: RegisterUserDto): Promise<User> {
+  async execute(dto: RegisterUserDto): Promise<LoginResult> {
     this.logger.info('Attempting to register new user', { pesel: dto.pesel });
 
     const existingUser = await this.userRepository.findByPesel(dto.pesel);
@@ -37,8 +38,7 @@ export class RegisterUserUseCase {
       passwordHash,
       passwordSalt,
       dto.firstName,
-      dto.lastName,
-      dto.role
+      dto.lastName
     );
 
     const createdUser = await this.userRepository.create(user);
@@ -48,6 +48,8 @@ export class RegisterUserUseCase {
       pesel: createdUser.pesel,
     });
 
-    return createdUser;
+    const token = this.authService.generateToken(user.id);
+
+    return { token };
   }
 }

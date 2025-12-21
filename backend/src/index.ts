@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import dotenv from 'dotenv';
 import { sql } from 'drizzle-orm';
 import { app } from './app';
