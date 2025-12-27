@@ -3,8 +3,8 @@ import { container } from '../../../../container';
 import {
   IUserRepository,
   IUserRepositoryToken,
-} from '../../../auth/application/repositories/user.repository.interface';
-import { UserRole } from '../../../auth/domain/entities/user.entity';
+} from '../../../user/application/repositories/user.repository.interface';
+import { UserRole } from '../../../user/domain/entities/user.entity';
 import { RequestWithUserInfo } from './auth.middleware';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

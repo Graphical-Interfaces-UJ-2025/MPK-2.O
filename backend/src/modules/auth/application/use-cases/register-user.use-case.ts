@@ -1,11 +1,15 @@
 import { inject, injectable } from 'tsyringe';
 import { v4 as uuidv4 } from 'uuid';
-import { IUserRepository, IUserRepositoryToken } from '../repositories/user.repository.interface';
+import {
+  IUserRepository,
+  IUserRepositoryToken,
+} from '../../../user/application/repositories/user.repository.interface';
 import { IAuthService, IAuthServiceToken } from '../services/auth.service.interface';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
-import { User } from '../../domain/entities/user.entity';
+import { User } from '../../../user/domain/entities/user.entity';
 import { RegisterUserDto } from '../dto/register-user.dto';
 import { LoginResult } from './login-user.use-case';
+import { AUTH_ERRORS } from '../../constants';
 
 @injectable()
 export class RegisterUserUseCase {
@@ -25,7 +29,7 @@ export class RegisterUserUseCase {
     const existingUser = await this.userRepository.findByPesel(dto.pesel);
     if (existingUser) {
       this.logger.warn('Registration failed: User already exists', { pesel: dto.pesel });
-      throw new Error('User with this PESEL already exists');
+      throw new Error(AUTH_ERRORS.USER_ALREADY_EXISTS);
     }
 
     const { hash: passwordHash, salt: passwordSalt } = await this.authService.hashPassword(
@@ -38,7 +42,8 @@ export class RegisterUserUseCase {
       passwordHash,
       passwordSalt,
       dto.firstName,
-      dto.lastName
+      dto.lastName,
+      0
     );
 
     const createdUser = await this.userRepository.create(user);

@@ -8,6 +8,7 @@ export class User {
     public readonly passwordSalt: string,
     public readonly firstName: string,
     public readonly lastName: string,
+    public readonly balance: number,
     public readonly role: UserRole,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
@@ -25,6 +26,7 @@ export class User {
     passwordSalt: string,
     firstName: string,
     lastName: string,
+    balance: number,
     role: UserRole = 'user'
   ): User {
     return new User(
@@ -34,6 +36,7 @@ export class User {
       passwordSalt,
       firstName,
       lastName,
+      balance,
       role,
       new Date(),
       new Date(),

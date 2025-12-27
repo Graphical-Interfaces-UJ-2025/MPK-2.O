@@ -12,6 +12,7 @@ import {
   RoleProtectedRouteConfig,
 } from './modules/shared/infrastructure/middlewares';
 import { writeFileSync } from 'fs';
+import { registerAppEventListeners } from './modules/shared/infrastructure/queue-listeners';
 
 const protectedRoutes: ProtectedRouteConfig[] = [
   { path: '/api/auth/me', methods: ['GET'] },
@@ -23,6 +24,8 @@ const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
   { path: '/api/tickets', methods: ['POST'], roles: ['admin', 'application_manager'] },
   { path: '/api/tickets/', methods: ['DELETE'], roles: ['admin', 'application_manager'] },
 ];
+
+registerAppEventListeners();
 
 const app: Express = express();
 

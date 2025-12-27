@@ -9,6 +9,7 @@ import {
   pgEnum,
   primaryKey,
   index,
+  decimal,
 } from 'drizzle-orm/pg-core';
 
 export const userRoleEnum = pgEnum('user_role', ['admin', 'user', 'application_manager']);
@@ -21,6 +22,7 @@ export const users = pgTable(
     lastName: varchar('last_name', { length: 255 }).notNull(),
     role: userRoleEnum('role').notNull(),
     pesel: varchar('pesel', { length: 11 }).notNull().unique(),
+    balance: integer('balance').notNull().default(0),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
     deletedAt: timestamp('deleted_at'),
@@ -141,3 +143,37 @@ export const personConcession = pgTable(
 
 export type PersonConcessionRecord = typeof personConcession.$inferSelect;
 export type NewPersonConcessionRecord = typeof personConcession.$inferInsert;
+
+export const transactionTypeEnum = pgEnum('transaction_type', [
+  'RECHARGE',
+  'TICKET_PURCHASE',
+  'TICKET_REFUND',
+]);
+
+export const transactionStatusEnum = pgEnum('transaction_status', [
+  'PENDING',
+  'COMPLETED',
+  'FAILED',
+]);
+
+export const transactions = pgTable(
+  'transactions',
+  {
+    id: uuid('id').primaryKey().notNull().unique(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'no action', onUpdate: 'no action' }),
+    type: transactionTypeEnum('type').notNull(),
+    amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+    ticketId: uuid('ticket_id').references(() => ticket.id, {
+      onDelete: 'no action',
+      onUpdate: 'no action',
+    }),
+    status: transactionStatusEnum('status').notNull().default('PENDING'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => [index('transactions_user_id_idx').on(table.userId)]
+);
+
+export type TransactionRecord = typeof transactions.$inferSelect;
+export type NewTransactionRecord = typeof transactions.$inferInsert;
