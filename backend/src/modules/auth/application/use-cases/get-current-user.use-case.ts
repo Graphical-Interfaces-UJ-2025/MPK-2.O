@@ -1,7 +1,11 @@
 import { inject, injectable } from 'tsyringe';
-import { IUserRepository, IUserRepositoryToken } from '../repositories/user.repository.interface';
+import {
+  IUserRepository,
+  IUserRepositoryToken,
+} from '../../../user/application/repositories/user.repository.interface';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
-import { User } from '../../domain/entities/user.entity';
+import { User } from '../../../user/domain/entities/user.entity';
+import { AUTH_ERRORS } from '../../constants';
 
 @injectable()
 export class GetCurrentUserUseCase {
@@ -20,7 +24,7 @@ export class GetCurrentUserUseCase {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       this.logger.warn('User not found', { userId });
-      throw new Error('User not found');
+      throw new Error(AUTH_ERRORS.USER_NOT_FOUND);
     }
 
     this.logger.info('User retrieved successfully', {

@@ -4,6 +4,7 @@ import {
   ITicketRepositoryToken,
 } from '../repositories/ticket.repository.interface';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
+import { TICKET_ERRORS } from '../../constants';
 
 @injectable()
 export class DeleteTicketUseCase {
@@ -22,12 +23,12 @@ export class DeleteTicketUseCase {
     const ticket = await this.ticketRepository.findByIdIncludeDeleted(id);
     if (!ticket) {
       this.logger.warn('Ticket not found', { id });
-      throw new Error('Ticket not found');
+      throw new Error(TICKET_ERRORS.TICKET_NOT_FOUND);
     }
 
     if (ticket.isDeleted) {
       this.logger.warn('Ticket already deleted', { id });
-      throw new Error('Ticket already deleted');
+      throw new Error(TICKET_ERRORS.TICKET_ALREADY_DELETED);
     }
 
     await this.ticketRepository.softDelete(id);

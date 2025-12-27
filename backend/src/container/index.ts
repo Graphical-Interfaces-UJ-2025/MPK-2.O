@@ -3,9 +3,13 @@ import { container } from 'tsyringe';
 
 import { ILoggerToken } from '../modules/shared/application/services/logger.interface';
 import { WinstonLogger } from '../modules/shared/infrastructure/services/winston-logger.service';
+import { IQueueServiceToken } from '../modules/shared/application/services/queue.interface';
+import { InMemoryQueueService } from '../modules/shared/infrastructure/services/in-memory-queue.service';
 
-import { IUserRepositoryToken } from '../modules/auth/application/repositories/user.repository.interface';
-import { UserRepository } from '../modules/auth/infrastructure/repositories/user.repository';
+import { IUserRepositoryToken } from '../modules/user/application/repositories/user.repository.interface';
+import { UserRepository } from '../modules/user/infrastructure/repositories/user.repository';
+import { IUserAccountRechargeRepositoryToken } from '../modules/user/application/repositories/user-account-recharge.repository.interface';
+import { UserAccountRechargeRepository } from '../modules/user/infrastructure/repositories/user-account-recharge.repository';
 import { IAuthServiceToken } from '../modules/auth/application/services/auth.service.interface';
 import { AuthService } from '../modules/auth/infrastructure/services/auth.service';
 
@@ -19,16 +23,25 @@ import { RegisterUserUseCase } from '../modules/auth/application/use-cases/regis
 import { LoginUserUseCase } from '../modules/auth/application/use-cases/login-user.use-case';
 import { GetCurrentUserUseCase } from '../modules/auth/application/use-cases/get-current-user.use-case';
 
+import { ITransactionRepositoryToken } from '../modules/transactions/application/repositories/transaction.repository.interface';
+import { TransactionRepository } from '../modules/transactions/infrastructure/repositories/transaction.repository';
+import { InitiateBalanceRechargeUseCase } from '../modules/transactions/application/use-cases/initiate-balance-recharge.use-case';
+import { ProceedBalanceRechargeUseCase } from '../modules/transactions/application/use-cases/proceed-balance-recharge.use-case';
+
 // ===========================
 // Shared Module Registrations
 // ===========================
 
-container.register(ILoggerToken, {
-  useClass: WinstonLogger,
-});
+container.registerSingleton(ILoggerToken, WinstonLogger);
+
+container.registerSingleton(IQueueServiceToken, InMemoryQueueService);
 
 container.register(IUserRepositoryToken, {
   useClass: UserRepository,
+});
+
+container.register(IUserAccountRechargeRepositoryToken, {
+  useClass: UserAccountRechargeRepository,
 });
 
 // ===========================
@@ -65,6 +78,22 @@ container.register(ITicketPriceRepositoryToken, {
 
 container.register(ITicketOrderRepositoryToken, {
   useClass: TicketOrderRepository,
+});
+
+// ===========================
+// Transactions Module Registrations
+// ===========================
+
+container.register(ITransactionRepositoryToken, {
+  useClass: TransactionRepository,
+});
+
+container.register(InitiateBalanceRechargeUseCase, {
+  useClass: InitiateBalanceRechargeUseCase,
+});
+
+container.register(ProceedBalanceRechargeUseCase, {
+  useClass: ProceedBalanceRechargeUseCase,
 });
 
 export { container };

@@ -56,7 +56,7 @@ export class WinstonLogger implements ILogger {
    * Create a child logger with a specific context
    */
   child(context: string): ILogger {
-    const childLogger = new WinstonLogger();
+    const childLogger = Object.create(WinstonLogger.prototype) as WinstonLogger;
     childLogger.logger = this.logger;
     childLogger.context = context;
     return childLogger;

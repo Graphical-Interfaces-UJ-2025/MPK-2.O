@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+process.setMaxListeners(20);
 import dotenv from 'dotenv';
 import { sql } from 'drizzle-orm';
 import { app } from './app';
