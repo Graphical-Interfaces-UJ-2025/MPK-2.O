@@ -17,12 +17,24 @@ import { registerAppEventListeners } from './modules/shared/infrastructure/queue
 const protectedRoutes: ProtectedRouteConfig[] = [
   { path: '/api/auth/me', methods: ['GET'] },
   { path: '/api/tickets', methods: ['*'] },
+  { path: '/api/users/balance/recharges', methods: ['GET'] },
 ];
 
 const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
+  {
+    path: '/api/tickets/orders-history/*',
+    methods: ['GET'],
+    roles: ['admin', 'application_manager'],
+  },
   { path: '/api/tickets/orders-history', methods: ['GET'], roles: ['user'] },
   { path: '/api/tickets', methods: ['POST'], roles: ['admin', 'application_manager'] },
   { path: '/api/tickets/', methods: ['DELETE'], roles: ['admin', 'application_manager'] },
+  {
+    path: '/api/users/balance/recharges/*',
+    methods: ['GET'],
+    roles: ['admin', 'application_manager'],
+  },
+  { path: '/api/users/balance/recharges', methods: ['GET'], roles: ['user'] },
 ];
 
 registerAppEventListeners();

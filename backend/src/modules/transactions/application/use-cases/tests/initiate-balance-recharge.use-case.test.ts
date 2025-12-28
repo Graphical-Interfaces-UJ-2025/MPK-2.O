@@ -7,7 +7,6 @@ import { ITransactionRepository } from '../../repositories/transaction.repositor
 import { InitiateBalanceRechargeUseCase } from '../initiate-balance-recharge.use-case';
 import { IQueueService } from '../../../../shared/application/services/queue.interface';
 import { TRANSACTION_EVENTS, TRANSACTION_ERRORS } from '../../../constants';
-import { Transaction } from '../../../domain/entities/transaction.entity';
 
 const createUserMock = () =>
   new User(
@@ -91,7 +90,7 @@ describe('InitiateBalanceRechargeUseCase', () => {
     const userId = '0aeb4ea5-a7ea-42cf-a2ae-4e073963fdca';
     vi.mocked(userRepositoryMock.findById).mockResolvedValue(createUserMock());
 
-    const response = await useCase.execute(userId, rechargeAmount);
+    await useCase.execute(userId, rechargeAmount);
 
     expect(transactionRepositoryMock.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -108,7 +107,5 @@ describe('InitiateBalanceRechargeUseCase', () => {
         transactionId: expect.any(String),
       })
     );
-
-    expect(response).toBeInstanceOf(Transaction);
   });
 });

@@ -26,39 +26,20 @@ export class AuthController {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             required:
-   *               - pesel
-   *               - password
-   *               - firstName
-   *               - lastName
-   *             properties:
-   *               pesel:
-   *                 type: string
-   *                 description: Polish national identification number (11 digits)
-   *               password:
-   *                 type: string
-   *               firstName:
-   *                 type: string
-   *               lastName:
-   *                 type: string
+   *             $ref: '#/components/schemas/RegisterRequest'
    *     responses:
    *       201:
    *         description: User successfully registered
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     token:
-   *                       type: string
+   *               $ref: '#/components/schemas/AuthResponse'
    *       400:
    *         description: Bad request
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async register(req: Request, res: Response): Promise<void> {
     try {
@@ -92,33 +73,20 @@ export class AuthController {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             required:
-   *               - pesel
-   *               - password
-   *             properties:
-   *               pesel:
-   *                 type: string
-   *                 description: Polish national identification number (11 digits)
-   *               password:
-   *                 type: string
+   *             $ref: '#/components/schemas/LoginRequest'
    *     responses:
    *       200:
    *         description: User successfully logged in
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     token:
-   *                       type: string
+   *               $ref: '#/components/schemas/AuthResponse'
    *       401:
    *         description: Invalid credentials
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async login(req: Request, res: Response): Promise<void> {
     try {
@@ -155,25 +123,13 @@ export class AuthController {
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     id:
-   *                       type: string
-   *                     pesel:
-   *                       type: string
-   *                     firstName:
-   *                       type: string
-   *                     lastName:
-   *                       type: string
-   *                     role:
-   *                       type: string
+   *               $ref: '#/components/schemas/UserResponse'
    *       401:
    *         description: Unauthorized - Invalid or missing token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async getMe(req: Request, res: Response): Promise<void> {
     try {

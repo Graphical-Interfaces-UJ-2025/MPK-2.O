@@ -19,6 +19,41 @@ export class User {
     return `${this.firstName} ${this.lastName}`;
   }
 
+  addBalance(amount: number): User {
+    return new User(
+      this.id,
+      this.pesel,
+      this.passwordHash,
+      this.passwordSalt,
+      this.firstName,
+      this.lastName,
+      this.balance + amount,
+      this.role,
+      this.createdAt,
+      new Date(),
+      this.deletedAt
+    );
+  }
+
+  deductBalance(amount: number): User {
+    if (this.balance < amount) {
+      throw new Error('Insufficient balance');
+    }
+    return new User(
+      this.id,
+      this.pesel,
+      this.passwordHash,
+      this.passwordSalt,
+      this.firstName,
+      this.lastName,
+      this.balance - amount,
+      this.role,
+      this.createdAt,
+      new Date(),
+      this.deletedAt
+    );
+  }
+
   static create(
     id: string,
     pesel: string,

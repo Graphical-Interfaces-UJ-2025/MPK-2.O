@@ -76,14 +76,12 @@ describe('ProceedBalanceRechargeUseCase', () => {
       createTransactionMock('PENDING')
     );
 
-    const response = await useCase.execute(mockTransactionId);
+    await useCase.execute(mockTransactionId);
 
     expect(transactionRepositoryMock.update).toBeCalledWith(
       expect.objectContaining({
         status: 'COMPLETED',
       })
     );
-
-    expect(response).toBeInstanceOf(Transaction);
   });
 });

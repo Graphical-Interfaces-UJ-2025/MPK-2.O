@@ -32,7 +32,7 @@ export class InitiateBalanceRechargeUseCase {
     this.logger = logger.child(this.constructor.name);
   }
 
-  public async execute(userId: string, amount: number): Promise<Transaction> {
+  public async execute(userId: string, amount: number): Promise<void> {
     this.logger.info('Initiating balance recharge', { userId, amount });
 
     const user = await this.userRepository.findById(userId);
@@ -59,7 +59,5 @@ export class InitiateBalanceRechargeUseCase {
       transactionId: transaction.id,
       amount,
     });
-
-    return transaction;
   }
 }
