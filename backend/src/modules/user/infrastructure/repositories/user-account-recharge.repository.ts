@@ -31,6 +31,6 @@ export class UserAccountRechargeRepository implements IUserAccountRechargeReposi
 
     const data = records.map(UserAccountRechargeMapper.toDomain);
 
-    return new PaginatedResult(data, pagination.limit, pagination.offset, totalResult.count);
+    return new PaginatedResult(data, pagination, totalResult.count);
   }
 }

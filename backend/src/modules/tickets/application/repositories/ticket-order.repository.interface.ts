@@ -4,7 +4,10 @@ import { PaginatedResult } from '../../../shared/application/query/paginated-res
 
 export interface ITicketOrderRepository {
   findByUserId(userId: string): Promise<TicketOrder[]>;
-  findByUserIdPaginated(userId: string, pagination: Pagination): Promise<PaginatedResult<TicketOrder>>;
+  findByUserIdPaginated(
+    userId: string,
+    pagination: Pagination
+  ): Promise<PaginatedResult<TicketOrder>>;
   create(order: TicketOrder): Promise<TicketOrder>;
 }
 

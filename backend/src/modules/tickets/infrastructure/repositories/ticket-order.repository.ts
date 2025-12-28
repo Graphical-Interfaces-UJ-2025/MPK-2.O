@@ -49,7 +49,7 @@ export class TicketOrderRepository implements ITicketOrderRepository {
 
     const data = result.map((r) => TicketOrderMapper.toDomain(r.order, r.ticketName ?? undefined));
 
-    return new PaginatedResult(data, pagination.limit, pagination.offset, totalResult.count);
+    return new PaginatedResult(data, pagination, totalResult.count);
   }
 
   async create(order: TicketOrder): Promise<TicketOrder> {

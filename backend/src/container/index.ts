@@ -30,6 +30,26 @@ import { TransactionRepository } from '../modules/transactions/infrastructure/re
 import { InitiateBalanceRechargeUseCase } from '../modules/transactions/application/use-cases/initiate-balance-recharge.use-case';
 import { ProceedBalanceRechargeUseCase } from '../modules/transactions/application/use-cases/proceed-balance-recharge.use-case';
 
+import { IStationRepositoryToken } from '../modules/station/application/repositories';
+import { StationRepository } from '../modules/station/infrastructure/repositories';
+import {
+  CreateStationUseCase,
+  GetStationUseCase,
+  GetStationsUseCase,
+  UpdateStationUseCase,
+  DeleteStationUseCase,
+} from '../modules/station/application/use-cases';
+
+import { ITransportRepositoryToken } from '../modules/transport/application/repositories';
+import { TransportRepository } from '../modules/transport/infrastructure/repositories';
+import {
+  CreateTransportUseCase,
+  GetTransportUseCase,
+  GetTransportsUseCase,
+  UpdateTransportUseCase,
+  DeleteTransportUseCase,
+} from '../modules/transport/application/use-cases';
+
 // ===========================
 // Shared Module Registrations
 // ===========================
@@ -104,6 +124,58 @@ container.register(InitiateBalanceRechargeUseCase, {
 
 container.register(ProceedBalanceRechargeUseCase, {
   useClass: ProceedBalanceRechargeUseCase,
+});
+
+// ===========================
+// Station Module Registrations
+// ===========================
+
+container.registerSingleton(IStationRepositoryToken, StationRepository);
+
+container.register(CreateStationUseCase, {
+  useClass: CreateStationUseCase,
+});
+
+container.register(GetStationUseCase, {
+  useClass: GetStationUseCase,
+});
+
+container.register(GetStationsUseCase, {
+  useClass: GetStationsUseCase,
+});
+
+container.register(UpdateStationUseCase, {
+  useClass: UpdateStationUseCase,
+});
+
+container.register(DeleteStationUseCase, {
+  useClass: DeleteStationUseCase,
+});
+
+// ===========================
+// Transport Module Registrations
+// ===========================
+
+container.registerSingleton(ITransportRepositoryToken, TransportRepository);
+
+container.register(CreateTransportUseCase, {
+  useClass: CreateTransportUseCase,
+});
+
+container.register(GetTransportUseCase, {
+  useClass: GetTransportUseCase,
+});
+
+container.register(GetTransportsUseCase, {
+  useClass: GetTransportsUseCase,
+});
+
+container.register(UpdateTransportUseCase, {
+  useClass: UpdateTransportUseCase,
+});
+
+container.register(DeleteTransportUseCase, {
+  useClass: DeleteTransportUseCase,
 });
 
 export { container };
