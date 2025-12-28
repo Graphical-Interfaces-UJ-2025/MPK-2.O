@@ -18,6 +18,8 @@ const protectedRoutes: ProtectedRouteConfig[] = [
   { path: '/api/auth/me', methods: ['GET'] },
   { path: '/api/tickets', methods: ['*'] },
   { path: '/api/users/balance/recharges', methods: ['GET'] },
+  { path: '/api/stations', methods: ['*'] },
+  { path: '/api/transports', methods: ['*'] },
 ];
 
 const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
@@ -35,6 +37,14 @@ const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
     roles: ['admin', 'application_manager'],
   },
   { path: '/api/users/balance/recharges', methods: ['GET'], roles: ['user'] },
+  // Station routes - read for admin and app_manager, mutations only for admin
+  { path: '/api/stations', methods: ['GET'], roles: ['admin', 'application_manager'] },
+  { path: '/api/stations', methods: ['POST'], roles: ['admin'] },
+  { path: '/api/stations', methods: ['PUT', 'DELETE'], roles: ['admin'] },
+  // Transport routes - read for admin and app_manager, mutations only for admin
+  { path: '/api/transports', methods: ['GET'], roles: ['admin', 'application_manager'] },
+  { path: '/api/transports', methods: ['POST'], roles: ['admin'] },
+  { path: '/api/transports', methods: ['PUT', 'DELETE'], roles: ['admin'] },
 ];
 
 registerAppEventListeners();

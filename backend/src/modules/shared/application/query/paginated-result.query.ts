@@ -1,21 +1,22 @@
+import { Pagination } from './pagination.query';
+
 export class PaginatedResult<T> {
   constructor(
     public readonly data: T[],
-    private readonly limit: number,
-    private readonly offset: number,
+    public readonly pagination: Pagination,
     public readonly total: number
   ) {}
 
   get hasNext() {
-    return this.offset + 2 * this.limit <= this.total;
+    return this.pagination.offset + 2 * this.pagination.limit <= this.total;
   }
 
   get hasPrev() {
-    return this.offset - this.limit >= 0;
+    return this.pagination.offset - this.pagination.limit >= 0;
   }
 
   get page() {
-    return this.offset / this.limit + 1;
+    return this.pagination.offset / this.pagination.limit + 1;
   }
 
   get pageSize() {
