@@ -19,6 +19,8 @@ import { ITicketPriceRepositoryToken } from '../modules/tickets/application/repo
 import { TicketPriceRepository } from '../modules/tickets/infrastructure/repositories/ticket-price.repository';
 import { ITicketOrderRepositoryToken } from '../modules/tickets/application/repositories/ticket-order.repository.interface';
 import { TicketOrderRepository } from '../modules/tickets/infrastructure/repositories/ticket-order.repository';
+import { PurchaseTicketUseCase } from '../modules/tickets/application/use-cases/purchase-ticket.use-case';
+import { GetUserTicketOrdersHistoryUseCase } from '../modules/tickets/application/use-cases/get-user-ticket-orders-history.use-case';
 import { RegisterUserUseCase } from '../modules/auth/application/use-cases/register-user.use-case';
 import { LoginUserUseCase } from '../modules/auth/application/use-cases/login-user.use-case';
 import { GetCurrentUserUseCase } from '../modules/auth/application/use-cases/get-current-user.use-case';
@@ -78,6 +80,14 @@ container.register(ITicketPriceRepositoryToken, {
 
 container.register(ITicketOrderRepositoryToken, {
   useClass: TicketOrderRepository,
+});
+
+container.register(PurchaseTicketUseCase, {
+  useClass: PurchaseTicketUseCase,
+});
+
+container.register(GetUserTicketOrdersHistoryUseCase, {
+  useClass: GetUserTicketOrdersHistoryUseCase,
 });
 
 // ===========================

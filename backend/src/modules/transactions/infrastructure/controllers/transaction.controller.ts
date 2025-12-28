@@ -23,51 +23,37 @@ export class TransactionController {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             required:
-   *               - amount
-   *             properties:
-   *               amount:
-   *                 type: integer
-   *                 description: Amount to recharge in grosze (minimum 5000 = 50 PLN)
+   *             $ref: '#/components/schemas/RechargeRequest'
    *     responses:
    *       201:
    *         description: Recharge transaction initiated successfully
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     transactionId:
-   *                       type: string
-   *                     amount:
-   *                       type: integer
-   *                     status:
-   *                       type: string
+   *               $ref: '#/components/schemas/RechargeInitiatedResponse'
    *       400:
    *         description: Bad request - Invalid amount or user not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    *       401:
    *         description: Unauthorized
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
    */
   async initiateRecharge(req: Request, res: Response): Promise<void> {
     try {
       const { id: userId } = (req as RequestWithUser).user;
       const { amount } = req.body;
 
-      const transaction = await this.initiateBalanceRechargeUseCase.execute(userId, amount);
+      await this.initiateBalanceRechargeUseCase.execute(userId, amount);
 
       res.status(201).json({
         success: true,
-        data: {
-          transactionId: transaction.id,
-          amount: transaction.amount,
-          status: transaction.status,
-        },
+        message: 'Balance recharge initiated successfully',
       });
     } catch (error) {
       res.status(400).json({

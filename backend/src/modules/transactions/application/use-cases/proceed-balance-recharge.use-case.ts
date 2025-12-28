@@ -4,7 +4,6 @@ import {
   ITransactionRepositoryToken,
 } from '../repositories/transaction.repository.interface';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
-import { Transaction } from '../../domain/entities/transaction.entity';
 import { TRANSACTION_ERRORS } from '../../constants';
 
 @injectable()
@@ -19,7 +18,7 @@ export class ProceedBalanceRechargeUseCase {
     this.logger = logger.child(this.constructor.name);
   }
 
-  public async execute(transactionId: string): Promise<Transaction> {
+  public async execute(transactionId: string) {
     this.logger.info('Processing balance recharge', { transactionId });
 
     const transaction = await this.transactionRepository.findById(transactionId);
@@ -46,7 +45,5 @@ export class ProceedBalanceRechargeUseCase {
       userId: transaction.userId,
       amount: transaction.amount,
     });
-
-    return completedTransaction;
   }
 }
