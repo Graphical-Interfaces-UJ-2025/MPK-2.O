@@ -37,7 +37,7 @@ export class CreateTransportUseCase {
     const createdTransport = await this.transportRepository.create(transport);
 
     this.logger.info('Transport created successfully', {
-      transportId: createdTransport.id,
+      // transportId: createdTransport.id
       referenceNumber: createdTransport.referenceNumber,
     });
 

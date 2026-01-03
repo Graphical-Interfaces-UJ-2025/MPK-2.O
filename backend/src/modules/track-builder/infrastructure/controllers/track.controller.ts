@@ -1,31 +1,31 @@
 import { inject, injectable } from 'tsyringe';
 import { Request, Response } from 'express';
 import {
-  CreateTransportUseCase,
-  GetTransportUseCase,
-  GetTransportsUseCase,
-  UpdateTransportUseCase,
-  DeleteTransportUseCase,
+  CreateTrackUseCase,
+  GetTrackUseCase,
+  GetTracksUseCase,
+  UpdateTrackUseCase,
+  DeleteTrackUseCase,
 } from '../../application/use-cases';
-import { CreateTransportDto, UpdateTransportDto } from '../../application/dto';
+import { CreateTrackDto, UpdateTrackDto } from '../../application/dto';
 import { Pagination } from '../../../shared/application/query/pagination.query';
 
 @injectable()
-export class TransportController {
+export class TrackController {
   constructor(
-    @inject(CreateTransportUseCase) private createTransportUseCase: CreateTransportUseCase,
-    @inject(GetTransportUseCase) private getTransportUseCase: GetTransportUseCase,
-    @inject(GetTransportsUseCase) private getTransportsUseCase: GetTransportsUseCase,
-    @inject(UpdateTransportUseCase) private updateTransportUseCase: UpdateTransportUseCase,
-    @inject(DeleteTransportUseCase) private deleteTransportUseCase: DeleteTransportUseCase
+    @inject(CreateTrackUseCase) private createTrackUseCase: CreateTrackUseCase,
+    @inject(GetTrackUseCase) private getTrackUseCase: GetTrackUseCase,
+    @inject(GetTracksUseCase) private getTracksUseCase: GetTracksUseCase,
+    @inject(UpdateTrackUseCase) private updateTrackUseCase: UpdateTrackUseCase,
+    @inject(DeleteTrackUseCase) private deleteTrackUseCase: DeleteTrackUseCase
   ) {}
 
   /**
    * @swagger
-   * /api/transports:
+   * /api/tracks:
    *   post:
-   *     summary: Create a new transport
-   *     tags: [Transports]
+   *     summary: Create a new track
+   *     tags: [Tracks]
    *     security:
    *       - bearerAuth: []
    *     requestBody:
@@ -35,22 +35,22 @@ export class TransportController {
    *           schema:
    *             type: object
    *             required:
-   *               - referenceNumber
-   *               - type
-   *               - directionName
+   *               - transportRefNumber
+   *               - stationIds
    *             properties:
-   *               referenceNumber:
+   *               transportRefNumber:
    *                 type: string
-   *               type:
-   *                 type: string
-   *                 enum: [autobus, tram]
-   *               directionName:
-   *                 type: string
+   *                 description: Reference number of the transport
+   *               stationIds:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                 description: Array of station UUIDs defining the track
    *     responses:
    *       201:
-   *         description: Transport created successfully
+   *         description: Track created successfully
    *       400:
-   *         description: Bad request
+   *         description: Bad request - validation failed
    *       401:
    *         description: Unauthorized
    *       403:
@@ -58,18 +58,19 @@ export class TransportController {
    */
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const { referenceNumber, type, directionName } = req.body;
-      const dto = new CreateTransportDto(referenceNumber, type, directionName);
-      const transport = await this.createTransportUseCase.execute(dto);
+      const { transportRefNumber, stationIds } = req.body;
+      const dto = new CreateTrackDto(transportRefNumber, stationIds);
+      const track = await this.createTrackUseCase.execute(dto);
 
       res.status(201).json({
         success: true,
         data: {
-          referenceNumber: transport.referenceNumber,
-          type: transport.type,
-          directionName: transport.directionName,
-          createdAt: transport.createdAt,
-          updatedAt: transport.updatedAt,
+          id: track.id,
+          name: track.name,
+          transportRefNumber: track.transportRefNumber,
+          stationIds: track.stationIds,
+          createdAt: track.createdAt,
+          updatedAt: track.updatedAt,
         },
       });
     } catch (error) {
@@ -82,10 +83,10 @@ export class TransportController {
 
   /**
    * @swagger
-   * /api/transports/{id}:
+   * /api/tracks/{id}:
    *   get:
-   *     summary: Get a transport by ID
-   *     tags: [Transports]
+   *     summary: Get a track by ID
+   *     tags: [Tracks]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -93,28 +94,38 @@ export class TransportController {
    *         name: id
    *         required: true
    *         schema:
-   *           type: string
+   *           type: integer
+   *         description: Track ID (integer)
    *     responses:
    *       200:
-   *         description: Transport retrieved successfully
+   *         description: Track retrieved successfully
    *       401:
    *         description: Unauthorized
    *       404:
-   *         description: Transport not found
+   *         description: Track not found
    */
   async getById(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params;
-      const transport = await this.getTransportUseCase.execute(id);
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid track ID - must be an integer',
+        });
+        return;
+      }
+
+      const track = await this.getTrackUseCase.execute(id);
 
       res.status(200).json({
         success: true,
         data: {
-          referenceNumber: transport.referenceNumber,
-          type: transport.type,
-          directionName: transport.directionName,
-          createdAt: transport.createdAt,
-          updatedAt: transport.updatedAt,
+          id: track.id,
+          name: track.name,
+          transportRefNumber: track.transportRefNumber,
+          stationIds: track.stationIds,
+          createdAt: track.createdAt,
+          updatedAt: track.updatedAt,
         },
       });
     } catch (error) {
@@ -127,10 +138,10 @@ export class TransportController {
 
   /**
    * @swagger
-   * /api/transports:
+   * /api/tracks:
    *   get:
-   *     summary: Get all transports with pagination
-   *     tags: [Transports]
+   *     summary: Get all tracks with pagination
+   *     tags: [Tracks]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -146,7 +157,7 @@ export class TransportController {
    *           default: 10
    *     responses:
    *       200:
-   *         description: Transports retrieved successfully
+   *         description: Tracks retrieved successfully
    *       401:
    *         description: Unauthorized
    */
@@ -157,16 +168,17 @@ export class TransportController {
       const offset = (page - 1) * limit;
 
       const pagination = new Pagination(limit, offset);
-      const result = await this.getTransportsUseCase.execute(pagination);
+      const result = await this.getTracksUseCase.execute(pagination);
 
       res.status(200).json({
         success: true,
-        data: result.data.map((transport) => ({
-          referenceNumber: transport.referenceNumber,
-          type: transport.type,
-          directionName: transport.directionName,
-          createdAt: transport.createdAt,
-          updatedAt: transport.updatedAt,
+        data: result.data.map((track) => ({
+          id: track.id,
+          name: track.name,
+          transportRefNumber: track.transportRefNumber,
+          stationIds: track.stationIds,
+          createdAt: track.createdAt,
+          updatedAt: track.updatedAt,
         })),
         pagination: {
           total: result.total,
@@ -186,10 +198,10 @@ export class TransportController {
 
   /**
    * @swagger
-   * /api/transports/{id}:
+   * /api/tracks/{id}:
    *   put:
-   *     summary: Update a transport
-   *     tags: [Transports]
+   *     summary: Update a track
+   *     tags: [Tracks]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -197,7 +209,7 @@ export class TransportController {
    *         name: id
    *         required: true
    *         schema:
-   *           type: string
+   *           type: integer
    *     requestBody:
    *       required: true
    *       content:
@@ -205,20 +217,18 @@ export class TransportController {
    *           schema:
    *             type: object
    *             required:
-   *               - referenceNumber
-   *               - type
-   *               - directionName
+   *               - transportRefNumber
+   *               - stationIds
    *             properties:
-   *               referenceNumber:
+   *               transportRefNumber:
    *                 type: string
-   *               type:
-   *                 type: string
-   *                 enum: [autobus, tram]
-   *               directionName:
-   *                 type: string
+   *               stationIds:
+   *                 type: array
+   *                 items:
+   *                   type: string
    *     responses:
    *       200:
-   *         description: Transport updated successfully
+   *         description: Track updated successfully
    *       400:
    *         description: Bad request
    *       401:
@@ -226,23 +236,32 @@ export class TransportController {
    *       403:
    *         description: Forbidden - Admin only
    *       404:
-   *         description: Transport not found
+   *         description: Track not found
    */
   async update(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params;
-      const { referenceNumber, type, directionName } = req.body;
-      const dto = new UpdateTransportDto(referenceNumber, type, directionName);
-      const transport = await this.updateTransportUseCase.execute(id, dto);
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid track ID - must be an integer',
+        });
+        return;
+      }
+
+      const { transportRefNumber, stationIds } = req.body;
+      const dto = new UpdateTrackDto(transportRefNumber, stationIds);
+      const track = await this.updateTrackUseCase.execute(id, dto);
 
       res.status(200).json({
         success: true,
         data: {
-          referenceNumber: transport.referenceNumber,
-          type: transport.type,
-          directionName: transport.directionName,
-          createdAt: transport.createdAt,
-          updatedAt: transport.updatedAt,
+          id: track.id,
+          name: track.name,
+          transportRefNumber: track.transportRefNumber,
+          stationIds: track.stationIds,
+          createdAt: track.createdAt,
+          updatedAt: track.updatedAt,
         },
       });
     } catch (error) {
@@ -257,10 +276,10 @@ export class TransportController {
 
   /**
    * @swagger
-   * /api/transports/{id}:
+   * /api/tracks/{id}:
    *   delete:
-   *     summary: Soft delete a transport
-   *     tags: [Transports]
+   *     summary: Soft delete a track
+   *     tags: [Tracks]
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -268,25 +287,33 @@ export class TransportController {
    *         name: id
    *         required: true
    *         schema:
-   *           type: string
+   *           type: integer
    *     responses:
    *       200:
-   *         description: Transport deleted successfully
+   *         description: Track deleted successfully
    *       401:
    *         description: Unauthorized
    *       403:
    *         description: Forbidden - Admin only
    *       404:
-   *         description: Transport not found
+   *         description: Track not found
    */
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params;
-      await this.deleteTransportUseCase.execute(id);
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid track ID - must be an integer',
+        });
+        return;
+      }
+
+      await this.deleteTrackUseCase.execute(id);
 
       res.status(200).json({
         success: true,
-        message: 'Transport deleted successfully',
+        message: 'Track deleted successfully',
       });
     } catch (error) {
       res.status(404).json({

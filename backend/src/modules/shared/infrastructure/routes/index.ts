@@ -5,6 +5,7 @@ import { transactionRoutes } from '../../../transactions/infrastructure/routes';
 import { userRoutes } from '../../../user/infrastructure/routes';
 import { stationRoutes } from '../../../station/infrastructure/routes';
 import { transportRoutes } from '../../../transport/infrastructure/routes';
+import { trackRoutes } from '../../../track-builder/infrastructure/routes';
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use('/transactions', transactionRoutes);
 router.use('/users', userRoutes);
 router.use('/stations', stationRoutes);
 router.use('/transports', transportRoutes);
+router.use('/tracks', trackRoutes);
 
 export { router };

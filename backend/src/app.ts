@@ -20,6 +20,7 @@ const protectedRoutes: ProtectedRouteConfig[] = [
   { path: '/api/users/balance/recharges', methods: ['GET'] },
   { path: '/api/stations', methods: ['*'] },
   { path: '/api/transports', methods: ['*'] },
+  { path: '/api/tracks', methods: ['*'] },
 ];
 
 const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
@@ -45,6 +46,10 @@ const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
   { path: '/api/transports', methods: ['GET'], roles: ['admin', 'application_manager'] },
   { path: '/api/transports', methods: ['POST'], roles: ['admin'] },
   { path: '/api/transports', methods: ['PUT', 'DELETE'], roles: ['admin'] },
+  // Track routes - all operations admin only
+  { path: '/api/tracks', methods: ['GET'], roles: ['admin'] },
+  { path: '/api/tracks', methods: ['POST'], roles: ['admin'] },
+  { path: '/api/tracks', methods: ['PUT', 'DELETE'], roles: ['admin'] },
 ];
 
 registerAppEventListeners();

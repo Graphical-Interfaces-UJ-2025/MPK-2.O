@@ -50,6 +50,16 @@ import {
   DeleteTransportUseCase,
 } from '../modules/transport/application/use-cases';
 
+import { ITrackRepositoryToken } from '../modules/track-builder/application/repositories';
+import { TrackRepository } from '../modules/track-builder/infrastructure/repositories';
+import {
+  CreateTrackUseCase,
+  GetTrackUseCase,
+  GetTracksUseCase,
+  UpdateTrackUseCase,
+  DeleteTrackUseCase,
+} from '../modules/track-builder/application/use-cases';
+
 // ===========================
 // Shared Module Registrations
 // ===========================
@@ -176,6 +186,32 @@ container.register(UpdateTransportUseCase, {
 
 container.register(DeleteTransportUseCase, {
   useClass: DeleteTransportUseCase,
+});
+
+// ===========================
+// Track Builder Module Registrations
+// ===========================
+
+container.registerSingleton(ITrackRepositoryToken, TrackRepository);
+
+container.register(CreateTrackUseCase, {
+  useClass: CreateTrackUseCase,
+});
+
+container.register(GetTrackUseCase, {
+  useClass: GetTrackUseCase,
+});
+
+container.register(GetTracksUseCase, {
+  useClass: GetTracksUseCase,
+});
+
+container.register(UpdateTrackUseCase, {
+  useClass: UpdateTrackUseCase,
+});
+
+container.register(DeleteTrackUseCase, {
+  useClass: DeleteTrackUseCase,
 });
 
 export { container };
