@@ -25,7 +25,7 @@ export class GetTransportUseCase {
     }
 
     this.logger.info('Transport retrieved successfully', {
-      transportId: transport.id,
+      // transportId: transport.id,
       referenceNumber: transport.referenceNumber,
     });
 

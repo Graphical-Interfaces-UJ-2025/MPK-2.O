@@ -2,7 +2,7 @@ export type TransportType = 'autobus' | 'tram';
 
 export class Transport {
   constructor(
-    public readonly id: string,
+    // public readonly id: string,
     public readonly referenceNumber: string,
     public readonly type: TransportType,
     public readonly directionName: string,
@@ -17,12 +17,20 @@ export class Transport {
     type: TransportType,
     directionName: string
   ): Transport {
-    return new Transport(id, referenceNumber, type, directionName, new Date(), new Date(), null);
+    return new Transport(
+      /*id ,*/
+      referenceNumber,
+      type,
+      directionName,
+      new Date(),
+      new Date(),
+      null
+    );
   }
 
   update(referenceNumber: string, type: TransportType, directionName: string): Transport {
     return new Transport(
-      this.id,
+      // this.id,
       referenceNumber,
       type,
       directionName,
@@ -34,7 +42,7 @@ export class Transport {
 
   softDelete(): Transport {
     return new Transport(
-      this.id,
+      // this.id,
       this.referenceNumber,
       this.type,
       this.directionName,

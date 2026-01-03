@@ -7,7 +7,7 @@ import { PaginatedResult } from '../../../shared/application/query/paginated-res
 
 const predefinedTransports: TransportRecord[] = [
   {
-    id: 'transport-1',
+    // id: 'transport-1',
     referenceNumber: '144',
     type: 'autobus',
     directionName: 'Bronowice - Dworzec Główny',
@@ -16,7 +16,7 @@ const predefinedTransports: TransportRecord[] = [
     deletedAt: null,
   },
   {
-    id: 'transport-2',
+    // id: 'transport-2',
     referenceNumber: '1',
     type: 'tram',
     directionName: 'Salwator - Wzgórza Krzesławickie',
@@ -25,7 +25,7 @@ const predefinedTransports: TransportRecord[] = [
     deletedAt: null,
   },
   {
-    id: 'transport-3',
+    // id: 'transport-3',
     referenceNumber: '52',
     type: 'tram',
     directionName: 'Krowodrza Górka - Łagiewniki',
@@ -34,7 +34,7 @@ const predefinedTransports: TransportRecord[] = [
     deletedAt: null,
   },
   {
-    id: 'transport-4',
+    // id: 'transport-4',
     referenceNumber: '252',
     type: 'autobus',
     directionName: 'Balice Airport - Główny',
@@ -43,7 +43,7 @@ const predefinedTransports: TransportRecord[] = [
     deletedAt: null,
   },
   {
-    id: 'transport-5',
+    // id: 'transport-5',
     referenceNumber: '10',
     type: 'tram',
     directionName: 'Pleszów - Łagiewniki',
@@ -56,7 +56,7 @@ const predefinedTransports: TransportRecord[] = [
 @injectable()
 export class TransportRepository implements ITransportRepository {
   private transports: Map<string, TransportRecord> = new Map(
-    predefinedTransports.map((t) => [t.id, t])
+    predefinedTransports.map((t) => [t.referenceNumber, t])
   );
 
   async findById(id: string): Promise<Transport | null> {
@@ -90,13 +90,13 @@ export class TransportRepository implements ITransportRepository {
 
   async create(transport: Transport): Promise<Transport> {
     const record = TransportMapper.toPersistence(transport);
-    this.transports.set(record.id, record);
+    this.transports.set(record.referenceNumber, record);
     return TransportMapper.toDomain(record);
   }
 
   async update(transport: Transport): Promise<Transport> {
     const record = TransportMapper.toPersistence(transport);
-    this.transports.set(record.id, record);
+    this.transports.set(record.referenceNumber, record);
     return TransportMapper.toDomain(record);
   }
 
