@@ -60,6 +60,18 @@ import {
   DeleteTrackUseCase,
 } from '../modules/track-builder/application/use-cases';
 
+import {
+  IGeographicalDistanceCalculatorToken,
+  IWalkingTimeEstimatorToken,
+  IStationFinderToken,
+} from '../modules/route-finder/application/services';
+import {
+  HaversineGeographicalDistanceCalculator,
+  CoefficientWalkingTimeEstimator,
+  StationFinderService,
+} from '../modules/route-finder/infrastructure/services';
+import { FindRouteUseCase } from '../modules/route-finder/application/use-cases';
+
 // ===========================
 // Shared Module Registrations
 // ===========================
@@ -212,6 +224,20 @@ container.register(UpdateTrackUseCase, {
 
 container.register(DeleteTrackUseCase, {
   useClass: DeleteTrackUseCase,
+});
+
+// ===========================
+// Route Finder Module Registrations
+// ===========================
+
+container.registerSingleton(IGeographicalDistanceCalculatorToken, HaversineGeographicalDistanceCalculator);
+
+container.registerSingleton(IWalkingTimeEstimatorToken, CoefficientWalkingTimeEstimator);
+
+container.registerSingleton(IStationFinderToken, StationFinderService);
+
+container.register(FindRouteUseCase, {
+  useClass: FindRouteUseCase,
 });
 
 export { container };
