@@ -12,6 +12,7 @@ const createUserMock = () =>
   new User(
     '245235-2352352',
     '46346462',
+    'test@mail.com',
     'password-hash',
     'password-salt',
     'Name',
@@ -25,6 +26,7 @@ const createUserMock = () =>
 const userRepositoryMock: IUserRepository = {
   findById: vi.fn(),
   findByPesel: vi.fn(),
+  findByEmail: vi.fn(),
   create: vi.fn().mockResolvedValue(createUserMock()),
   update: vi.fn(),
   delete: vi.fn(),

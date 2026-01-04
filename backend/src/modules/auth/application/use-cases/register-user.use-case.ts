@@ -24,11 +24,11 @@ export class RegisterUserUseCase {
   }
 
   async execute(dto: RegisterUserDto): Promise<LoginResult> {
-    this.logger.info('Attempting to register new user', { pesel: dto.pesel });
+    this.logger.info('Attempting to register new user', { email: dto.email });
 
-    const existingUser = await this.userRepository.findByPesel(dto.pesel);
+    const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser) {
-      this.logger.warn('Registration failed: User already exists', { pesel: dto.pesel });
+      this.logger.warn('Registration failed: User already exists', { email: dto.email });
       throw new Error(AUTH_ERRORS.USER_ALREADY_EXISTS);
     }
 
@@ -39,6 +39,7 @@ export class RegisterUserUseCase {
     const user = User.create(
       uuidv4(),
       dto.pesel,
+      dto.email,
       passwordHash,
       passwordSalt,
       dto.firstName,
@@ -50,7 +51,7 @@ export class RegisterUserUseCase {
 
     this.logger.info('User registered successfully', {
       userId: createdUser.id,
-      pesel: createdUser.pesel,
+      email: createdUser.email,
     });
 
     const token = this.authService.generateToken(user.id);

@@ -57,6 +57,7 @@ export class TicketController {
           id: t.id,
           name: t.name,
           price: t.currentPrice,
+          validTime: t.validTime,
           createdAt: t.createdAt,
           updatedAt: t.updatedAt,
           deletedAt: t.deletedAt,
@@ -126,6 +127,7 @@ export class TicketController {
           id: ticket.id,
           name: ticket.name,
           price: ticket.currentPrice,
+          validTime: ticket.validTime,
           createdAt: ticket.createdAt,
           updatedAt: ticket.updatedAt,
           deletedAt: ticket.deletedAt,
@@ -181,8 +183,8 @@ export class TicketController {
    */
   async create(req: Request, res: Response): Promise<void> {
     try {
-      const { name, price } = req.body;
-      const dto = new CreateTicketDto(name, price);
+      const { name, price, validTime } = req.body;
+      const dto = new CreateTicketDto(name, price, validTime);
       const ticket = await this.createTicketUseCase.execute(dto);
 
       res.status(201).json({
@@ -191,6 +193,7 @@ export class TicketController {
           id: ticket.id,
           name: ticket.name,
           price: ticket.currentPrice,
+          validTime: ticket.validTime,
           createdAt: ticket.createdAt,
           updatedAt: ticket.updatedAt,
         },
@@ -265,7 +268,7 @@ export class TicketController {
 
   /**
    * @swagger
-   * /api/tickets/orders-history:
+   * /api/tickets/orders-history/{id}:
    *   get:
    *     summary: Get order history for current user
    *     description: Returns paginated ticket order history for the authenticated user. Only accessible by users with 'user' role.

@@ -30,7 +30,7 @@ const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
     roles: ['admin', 'application_manager'],
   },
   { path: '/api/tickets/orders-history', methods: ['GET'], roles: ['user'] },
-  { path: '/api/tickets', methods: ['POST'], roles: ['admin', 'application_manager'] },
+  // { path: '/api/tickets', methods: ['POST'], roles: ['admin', 'application_manager'] },
   { path: '/api/tickets/', methods: ['DELETE'], roles: ['admin', 'application_manager'] },
   {
     path: '/api/users/balance/recharges/*',

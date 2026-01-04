@@ -25,17 +25,17 @@ export class LoginUserUseCase {
   }
 
   async execute(dto: LoginUserDto): Promise<LoginResult> {
-    this.logger.info('Attempting to login user', { pesel: dto.pesel });
+    this.logger.info('Attempting to login user', { email: dto.email });
 
-    const user = await this.userRepository.findByPesel(dto.pesel);
+    const user = await this.userRepository.findByEmail(dto.email);
     if (!user) {
-      this.logger.warn('Login failed: User not found', { pesel: dto.pesel });
+      this.logger.warn('Login failed: User not found', { email: dto.email });
       throw new Error(AUTH_ERRORS.INVALID_CREDENTIALS);
     }
 
     const isPasswordValid = await this.authService.comparePassword(dto.password, user.passwordHash);
     if (!isPasswordValid) {
-      this.logger.warn('Login failed: Invalid password', { pesel: dto.pesel });
+      this.logger.warn('Login failed: Invalid password', { email: dto.email });
       throw new Error(AUTH_ERRORS.INVALID_CREDENTIALS);
     }
 
@@ -43,7 +43,7 @@ export class LoginUserUseCase {
 
     this.logger.info('User logged in successfully', {
       userId: user.id,
-      pesel: user.pesel,
+      email: user.email,
     });
 
     return { token };

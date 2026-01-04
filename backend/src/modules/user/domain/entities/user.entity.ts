@@ -4,6 +4,7 @@ export class User {
   constructor(
     public readonly id: string,
     public readonly pesel: string,
+    public readonly email: string,
     public readonly passwordHash: string,
     public readonly passwordSalt: string,
     public readonly firstName: string,
@@ -23,6 +24,7 @@ export class User {
     return new User(
       this.id,
       this.pesel,
+      this.email,
       this.passwordHash,
       this.passwordSalt,
       this.firstName,
@@ -42,6 +44,7 @@ export class User {
     return new User(
       this.id,
       this.pesel,
+      this.email,
       this.passwordHash,
       this.passwordSalt,
       this.firstName,
@@ -57,6 +60,7 @@ export class User {
   static create(
     id: string,
     pesel: string,
+    email: string,
     passwordHash: string,
     passwordSalt: string,
     firstName: string,
@@ -67,6 +71,7 @@ export class User {
     return new User(
       id,
       pesel,
+      email,
       passwordHash,
       passwordSalt,
       firstName,

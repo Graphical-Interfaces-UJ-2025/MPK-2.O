@@ -43,9 +43,9 @@ export class AuthController {
    */
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { pesel, password, firstName, lastName } = req.body;
+      const { pesel, email, password, firstName, lastName } = req.body;
 
-      const dto = new RegisterUserDto(pesel, password, firstName, lastName);
+      const dto = new RegisterUserDto(pesel, email, password, firstName, lastName);
       const { token } = await this.registerUserUseCase.execute(dto);
 
       res.status(201).json({
@@ -90,9 +90,9 @@ export class AuthController {
    */
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { pesel, password } = req.body;
+      const { email, password } = req.body;
 
-      const dto = new LoginUserDto(pesel, password);
+      const dto = new LoginUserDto(email, password);
       const { token } = await this.loginUserUseCase.execute(dto);
 
       res.status(200).json({

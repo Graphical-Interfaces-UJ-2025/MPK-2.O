@@ -11,6 +11,7 @@ const createUserMock = () =>
   new User(
     '245235-2352352',
     '46346462',
+    'test@example.com',
     'password-hash',
     'password-salt',
     'Name',
@@ -24,6 +25,7 @@ const createUserMock = () =>
 const userRepositoryMock: IUserRepository = {
   findById: vi.fn(),
   findByPesel: vi.fn(),
+  findByEmail: vi.fn(),
   create: vi.fn().mockResolvedValue(createUserMock()),
   update: vi.fn(),
   delete: vi.fn(),
@@ -57,18 +59,19 @@ describe('RegisterUserUseCase', () => {
     useCase = new RegisterUserUseCase(userRepositoryMock, authServiceMock, loggerMock);
   });
 
-  it('Creates new user if no user with this pesel is registered', async ({ expect }) => {
-    vi.mocked(userRepositoryMock.findByPesel).mockResolvedValue(null);
+  it('Creates new user if no user with this email is registered', async ({ expect }) => {
+    vi.mocked(userRepositoryMock.findByEmail).mockResolvedValue(null);
 
     const response = await useCase.execute({
       pesel: '35235235123',
+      email: 'newuser@example.com',
       password: 'password',
       firstName: 'Name',
       lastName: 'LastName',
     });
 
     expect(userRepositoryMock.create).toHaveBeenCalledWith(
-      expect.objectContaining({ pesel: '35235235123' })
+      expect.objectContaining({ pesel: '35235235123', email: 'newuser@example.com' })
     );
 
     expect(authServiceMock.hashPassword).toHaveBeenCalledWith('password');
@@ -80,11 +83,12 @@ describe('RegisterUserUseCase', () => {
     });
   });
 
-  it('Fails when user with this pesel already exists', async ({ expect }) => {
-    vi.mocked(userRepositoryMock.findByPesel).mockResolvedValue(createUserMock());
+  it('Fails when user with this email already exists', async ({ expect }) => {
+    vi.mocked(userRepositoryMock.findByEmail).mockResolvedValue(createUserMock());
 
     const response = useCase.execute({
       pesel: '35235235123',
+      email: 'existing@example.com',
       password: 'password',
       firstName: 'Name',
       lastName: 'LastName',

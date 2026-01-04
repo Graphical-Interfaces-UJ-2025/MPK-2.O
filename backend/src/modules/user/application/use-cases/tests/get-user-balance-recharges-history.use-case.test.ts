@@ -15,6 +15,7 @@ const createUserMock = () =>
   new User(
     '245235-2352352',
     '46346462',
+    'example@mail.com',
     'password-hash',
     'password-salt',
     'Name',
@@ -36,17 +37,15 @@ const createUserAccountRechargeMock = (overrides?: Partial<UserAccountRecharge>)
 const createPaginatedResultMock = (
   data: UserAccountRecharge[] = [],
   options?: { limit?: number; offset?: number; total?: number }
-) =>
-  new PaginatedResult(
-    data,
-    options?.limit ?? 20,
-    options?.offset ?? 0,
-    options?.total ?? data.length
-  );
+) => {
+  const mockPagination = new Pagination(options?.limit ?? 20, options?.offset ?? 0);
+  return new PaginatedResult(data, mockPagination, options?.total ?? data.length);
+};
 
 const userRepositoryMock: IUserRepository = {
   findById: vi.fn(),
   findByPesel: vi.fn(),
+  findByEmail: vi.fn(),
   create: vi.fn().mockResolvedValue(createUserMock()),
   update: vi.fn(),
   delete: vi.fn(),

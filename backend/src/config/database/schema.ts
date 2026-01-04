@@ -14,6 +14,8 @@ import {
 
 export const userRoleEnum = pgEnum('user_role', ['admin', 'user', 'application_manager']);
 
+export const validTimeUnitEnum = pgEnum('valid_time_unit', ['minutes', 'days', 'months']);
+
 export const users = pgTable(
   'users',
   {
@@ -21,7 +23,8 @@ export const users = pgTable(
     firstName: varchar('first_name', { length: 255 }).notNull(),
     lastName: varchar('last_name', { length: 255 }).notNull(),
     role: userRoleEnum('role').notNull(),
-    pesel: varchar('pesel', { length: 11 }).notNull().unique(),
+    email: varchar('email').notNull().unique(),
+    pesel: varchar('pesel', { length: 11 }).notNull(),
     balance: integer('balance').notNull().default(0),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -38,6 +41,8 @@ export type NewUserRecord = typeof users.$inferInsert;
 export const ticket = pgTable('ticket', {
   id: uuid('id').primaryKey().notNull().unique(),
   name: varchar('name', { length: 255 }).notNull().unique(),
+  validTimeValue: integer('valid_time_value').notNull(),
+  validTimeUnit: validTimeUnitEnum('valid_time_unit').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
