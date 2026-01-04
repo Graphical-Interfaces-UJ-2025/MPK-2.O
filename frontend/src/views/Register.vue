@@ -5,37 +5,48 @@ import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
 
 const email = ref('');
+const pesel = ref('');
 const password = ref('');
+const firstName = ref('');
+const lastName = ref('');
 
-const postLogin = async () => {
-  try {
-    await authStore.login(email.value, password.value);
-  } catch (err) {
-    // Error handling is done in the store
-  }
+const postRegister = async () => {
+  await authStore.register(email.value, pesel.value, password.value, firstName.value, lastName.value);
 };
 </script>
 
 <template>
   <main>
-    <div class="login-form">
-      <h1>Logowanie</h1>
-      <form @submit.prevent="postLogin" novalidate>
+    <div class="register-form">
+      <h1>Rejestracja</h1>
+      <form @submit.prevent="postRegister" novalidate>
         <div class="form-group">
           <i class="fa-solid fa-id-card"></i>
-          <input type="email" v-model="email" placeholder="Mail" required autocomplete="email" />
+          <input type="email" v-model="email" placeholder="email" required autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <i class="fa-solid fa-id-card"></i>
+          <input type="text" v-model="pesel" placeholder="PESEL" required autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" v-model="firstName" placeholder="Imię" required autocomplete="given-name" />
+        </div>
+        <div class="form-group">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" v-model="lastName" placeholder="Nazwisko" required autocomplete="family-name" />
         </div>
         <div class="form-group">
           <i class="fa-solid fa-lock"></i>
-          <input type="password" v-model="password" placeholder="Hasło" required autocomplete="current-password" />
+          <input type="password" v-model="password" placeholder="Hasło" required autocomplete="new-password" />
         </div>
         <div class="error-message" v-if="authStore.error">{{ authStore.error }}</div>
         <button type="submit" class="auth-button" :disabled="authStore.isLoading">
-          <i v-if="!authStore.isLoading" class="fa-solid fa-right-to-bracket"></i>
+          <i v-if="!authStore.isLoading" class="fa-solid fa-user-plus"></i>
           <i v-else class="fa-solid fa-spinner fa-spin"></i>
-          {{ authStore.isLoading ? 'Logowanie...' : 'Zaloguj' }}
+          {{ authStore.isLoading ? 'Rejestracja...' : 'Zarejestruj się' }}
         </button>
-        <span class="register-text">Nie masz konta? <router-link to="/register">Zarejestruj się</router-link></span>
+        <span class="login-text">Masz konto? <router-link to="/login">Zaloguj się</router-link></span>
       </form>
     </div>
   </main>
@@ -51,7 +62,7 @@ main {
   width: 100%;
 }
 
-.login-form {
+.register-form {
   width: 100%;
   max-width: 450px;
   margin: 20px;
@@ -136,12 +147,12 @@ h1 {
   min-height: 20px;
 }
 
-.register-text {
+.login-text {
   color: var(--text-primary);
   font-size: 1em;
 }
 
-.register-text a {
+.login-text a {
   color: #001f3f;
   font-weight: 600;
   cursor: pointer;
@@ -150,13 +161,13 @@ h1 {
   text-decoration: none;
 }
 
-.register-text a:hover {
+.login-text a:hover {
   text-decoration: underline;
 }
 
 /* Responsive */
 @media (max-width: 480px) {
-  .login-form {
+  .register-form {
     padding: 20px;
   }
 

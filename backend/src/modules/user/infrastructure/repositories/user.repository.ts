@@ -18,6 +18,11 @@ export class UserRepository implements IUserRepository {
     return record ? UserMapper.toDomain(record) : null;
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    const [record] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return record ? UserMapper.toDomain(record) : null;
+  }
+
   async create(user: User): Promise<User> {
     const data = UserMapper.toPersistence(user);
     const [record] = await db.insert(users).values(data).returning();

@@ -86,8 +86,9 @@ const options: swaggerJsdoc.Options = {
         // Auth schemas
         RegisterRequest: {
           type: 'object',
-          required: ['pesel', 'password', 'firstName', 'lastName'],
+          required: ['email', 'pesel', 'password', 'firstName', 'lastName'],
           properties: {
+            email: { type: 'string' },
             pesel: {
               type: 'string',
               description: 'Polish national identification number (11 digits)',
@@ -99,11 +100,10 @@ const options: swaggerJsdoc.Options = {
         },
         LoginRequest: {
           type: 'object',
-          required: ['pesel', 'password'],
+          required: ['email', 'password'],
           properties: {
-            pesel: {
+            email: {
               type: 'string',
-              description: 'Polish national identification number (11 digits)',
             },
             password: { type: 'string' },
           },
@@ -137,12 +137,21 @@ const options: swaggerJsdoc.Options = {
           },
         },
         // Ticket schemas
+        ValidTime: {
+          type: 'object',
+          required: ['value', 'unit'],
+          properties: {
+            value: { type: 'integer', description: 'Time value' },
+            unit: { type: 'string', enum: ['minutes', 'days', 'months'], description: 'Time unit' },
+          },
+        },
         Ticket: {
           type: 'object',
           properties: {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             price: { type: 'integer', description: 'Price in grosze' },
+            validTime: { $ref: '#/components/schemas/ValidTime' },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
             deletedAt: { type: 'string', format: 'date-time', nullable: true },
@@ -167,10 +176,11 @@ const options: swaggerJsdoc.Options = {
         },
         CreateTicketRequest: {
           type: 'object',
-          required: ['name', 'price'],
+          required: ['name', 'price', 'validTime'],
           properties: {
             name: { type: 'string' },
             price: { type: 'integer', description: 'Price in grosze' },
+            validTime: { $ref: '#/components/schemas/ValidTime' },
           },
         },
         PurchaseTicketRequest: {

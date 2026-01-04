@@ -11,7 +11,9 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'transport_system',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
-  ssl: true,
+  ssl: {
+    rejectUnauthorized: false,
+  },
   max: 10,
   min: 2,
 });

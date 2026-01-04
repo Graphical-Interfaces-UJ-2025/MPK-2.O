@@ -11,6 +11,7 @@ const createUserMock = () =>
   new User(
     '245235-2352352',
     '46346462',
+    'test@example.com',
     'password-hash',
     'password-salt',
     'Name',
@@ -24,6 +25,7 @@ const createUserMock = () =>
 const userRepositoryMock: IUserRepository = {
   findById: vi.fn(),
   findByPesel: vi.fn(),
+  findByEmail: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
@@ -55,11 +57,11 @@ describe('LoginUserUseCase', () => {
   });
 
   it('Successful user login', async ({ expect }) => {
-    vi.mocked(userRepositoryMock.findByPesel).mockResolvedValue(createUserMock());
+    vi.mocked(userRepositoryMock.findByEmail).mockResolvedValue(createUserMock());
     vi.mocked(authServiceMock.comparePassword).mockResolvedValue(true);
 
     const response = await useCase.execute({
-      pesel: '12354646',
+      email: 'test@example.com',
       password: '523523523',
     });
 
@@ -69,11 +71,11 @@ describe('LoginUserUseCase', () => {
   });
 
   it('Invalid password provided by user', async ({ expect }) => {
-    vi.mocked(userRepositoryMock.findByPesel).mockResolvedValue(createUserMock());
+    vi.mocked(userRepositoryMock.findByEmail).mockResolvedValue(createUserMock());
     vi.mocked(authServiceMock.comparePassword).mockResolvedValue(false);
 
     const response = useCase.execute({
-      pesel: '12354646',
+      email: 'test@example.com',
       password: '523523523',
     });
 
@@ -81,11 +83,11 @@ describe('LoginUserUseCase', () => {
   });
 
   it('Login to non existing account', async ({ expect }) => {
-    vi.mocked(userRepositoryMock.findByPesel).mockResolvedValue(null);
+    vi.mocked(userRepositoryMock.findByEmail).mockResolvedValue(null);
     vi.mocked(authServiceMock.comparePassword).mockResolvedValue(true);
 
     const response = useCase.execute({
-      pesel: '12354646',
+      email: 'test@example.com',
       password: '523523523',
     });
 

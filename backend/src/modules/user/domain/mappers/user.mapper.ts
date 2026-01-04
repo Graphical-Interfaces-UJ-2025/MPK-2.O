@@ -6,6 +6,7 @@ export class UserMapper {
     return new User(
       record.id,
       record.pesel,
+      record.email,
       record.passwordHash,
       record.passwordSalt,
       record.firstName,
@@ -22,6 +23,7 @@ export class UserMapper {
     return {
       id: user.id,
       pesel: user.pesel,
+      email: user.email,
       passwordHash: user.passwordHash,
       passwordSalt: user.passwordSalt,
       firstName: user.firstName,

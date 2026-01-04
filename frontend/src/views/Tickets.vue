@@ -1,344 +1,417 @@
+<script setup>
+import { onMounted } from 'vue';
+import { useTicketsStore } from '@/stores/tickets';
+import { useAuthStore } from '@/stores/auth';
+import TicketCard from '@/components/TicketCard.vue';
+
+const ticketsStore = useTicketsStore();
+const authStore = useAuthStore();
+
+onMounted(() => {
+  ticketsStore.fetchTickets();
+});
+
+const handleSelectTicket = (ticketId) => {
+  ticketsStore.selectTicket(ticketId);
+};
+
+const handlePurchase = async () => {
+  await ticketsStore.purchaseTicket();
+};
+
+const concessions = [
+  { id: 0, label: 'Normalny', description: 'Bilet pełnopłatny' },
+  { id: 1, label: 'Ulgowy - Student', description: 'Bilet dla studentów' },
+  { id: 2, label: 'Ulgowy - Senior', description: 'Bilet dla seniorów' },
+];
+</script>
+
 <template>
   <div class="wrapper">
-    <div class="card">
-      <div class="header">
-        <h1>Zakup biletów</h1>
-        <p class="subtitle">Wybierz parametry i dokonaj płatności</p>
+    <div class="container">
+      <!-- Header with balance -->
+      <div class="page-header">
+        <h1>Kup bilet</h1>
+        <div v-if="authStore.isAuthenticated" class="balance-badge">
+          <i class="fa-solid fa-wallet"></i>
+          <span>{{ authStore.formattedBalance }}</span>
+        </div>
       </div>
 
-      <form @submit.prevent="handlePayment">
-        <section class="form-section">
-          <div class="section-header">
-            <span class="step-number">1</span>
-            <h2>Wybierz strefę</h2>
-          </div>
-          <div class="options zones-grid">
-            <label v-for="z in zones" :key="z.name" class="option-card" :class="{ active: zone?.name === z.name }">
-              <input type="radio" v-model="zone" :value="z" />
-              <div class="option-content">
-                <span class="zone-badge">{{ z.name }}</span>
-                <span class="multiplier">{{ z.multiplier }}x</span>
-              </div>
-            </label>
-          </div>
-        </section>
+      <!-- Available Tickets Section -->
+      <section class="tickets-section">
+        <h2>Dostępne bilety</h2>
 
-        <section class="form-section">
-          <div class="section-header">
-            <span class="step-number">2</span>
-            <h2>Typ biletu</h2>
-          </div>
-          <div class="options types-grid">
-            <label v-for="t in types" :key="t.name" class="option-card" :class="{ active: type?.name === t.name }">
-              <input type="radio" v-model="type" :value="t" />
-              <div class="option-content">
-                <span class="type-name">{{ t.name }}</span>
-                <span class="base-price">{{ t.base }} zł/dzień</span>
-              </div>
-            </label>
-          </div>
-        </section>
-
-        <section class="form-section">
-          <div class="section-header">
-            <span class="step-number">3</span>
-            <h2>Okres ważności</h2>
-          </div>
-          <div class="dates">
-            <div class="date-input-group">
-              <label for="dateFrom">Od</label>
-              <input type="date" id="dateFrom" v-model="dateFrom" />
-            </div>
-            <div class="date-input-group">
-              <label for="dateTo">Do</label>
-              <input type="date" id="dateTo" v-model="dateTo" />
-            </div>
-          </div>
-          <div v-if="days > 0" class="days-info">
-            Liczba dni: <strong>{{ days }}</strong>
-          </div>
-        </section>
-
-        <div class="price-summary" v-if="canCalculate">
-          <div class="summary-label">Kwota do zapłaty</div>
-          <div class="summary-price">{{ price }} zł</div>
+        <div v-if="ticketsStore.isLoading" class="loading-state">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <p>Ładowanie biletów...</p>
         </div>
 
-        <button type="submit" :disabled="!canCalculate" class="pay-button">
-          <span v-if="canCalculate">Dokonaj płatności</span>
-          <span v-else>Uzupełnij wszystkie pola</span>
-        </button>
-      </form>
+        <div v-else-if="ticketsStore.availableTickets.length === 0" class="empty-state">
+          <i class="fa-solid fa-ticket"></i>
+          <p>Brak dostępnych biletów</p>
+        </div>
 
-      <p class="note">Pola oznaczone krokami są obowiązkowe</p>
+        <div v-else class="tickets-grid">
+          <TicketCard
+            v-for="ticket in ticketsStore.availableTickets"
+            :key="ticket.id"
+            :ticket="ticket"
+            :selected="ticketsStore.selectedTicket?.id === ticket.id"
+            @select="handleSelectTicket"
+          />
+        </div>
+      </section>
+
+      <!-- Purchase Form Section -->
+      <section v-if="ticketsStore.selectedTicket" class="purchase-section">
+        <div class="card">
+          <div class="section-header">
+            <h2>Szczegóły zakupu</h2>
+            <button @click="ticketsStore.clearSelection()" class="clear-button">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </div>
+
+          <!-- Selected Ticket Summary -->
+          <div class="selected-ticket-summary">
+            <div class="summary-row">
+              <span>Wybrany bilet:</span>
+              <strong>{{ ticketsStore.selectedTicket.name }}</strong>
+            </div>
+            <div class="summary-row">
+              <span>Cena:</span>
+              <strong>{{ ticketsStore.formattedTicketPrice }}</strong>
+            </div>
+          </div>
+
+          <!-- Date Range Picker -->
+          <div class="form-group">
+            <label>Ważny od</label>
+            <input
+              type="datetime-local"
+              :value="ticketsStore.purchaseForm.validFrom"
+              @input="ticketsStore.updatePurchaseForm('validFrom', $event.target.value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Ważny do</label>
+            <input
+              type="datetime-local"
+              :value="ticketsStore.purchaseForm.validTo"
+              @input="ticketsStore.updatePurchaseForm('validTo', $event.target.value)"
+            />
+          </div>
+
+          <!-- Duration Display -->
+          <div v-if="ticketsStore.purchaseDuration > 0" class="duration-info">
+            <i class="fa-solid fa-clock"></i>
+            <span>Okres ważności: <strong>{{ ticketsStore.purchaseDuration }} dni</strong></span>
+          </div>
+
+          <!-- Concession Selection -->
+          <div class="form-group">
+            <label>Typ biletu</label>
+            <div class="concession-options">
+              <label
+                v-for="concession in concessions"
+                :key="concession.id"
+                class="concession-option"
+                :class="{ active: ticketsStore.purchaseForm.concessionId === concession.id }"
+              >
+                <input
+                  type="radio"
+                  :value="concession.id"
+                  :checked="ticketsStore.purchaseForm.concessionId === concession.id"
+                  @change="ticketsStore.updatePurchaseForm('concessionId', concession.id)"
+                />
+                <div class="concession-content">
+                  <span class="concession-label">{{ concession.label }}</span>
+                  <span class="concession-description">{{ concession.description }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Balance Warning -->
+          <div v-if="!ticketsStore.checkSufficientBalance(ticketsStore.selectedTicket.price)" class="warning-message">
+            <i class="fa-solid fa-exclamation-triangle"></i>
+            <span>Niewystarczające saldo. Doładuj konto aby kupić bilet.</span>
+          </div>
+
+          <!-- Error Message -->
+          <div v-if="ticketsStore.error" class="error-message">
+            <i class="fa-solid fa-exclamation-circle"></i>
+            <span>{{ ticketsStore.error }}</span>
+          </div>
+
+          <!-- Purchase Button -->
+          <button
+            @click="handlePurchase"
+            class="purchase-button"
+            :disabled="!ticketsStore.canPurchase || ticketsStore.isLoading"
+          >
+            <i v-if="!ticketsStore.isLoading" class="fa-solid fa-shopping-cart"></i>
+            <i v-else class="fa-solid fa-spinner fa-spin"></i>
+            {{ ticketsStore.isLoading ? 'Przetwarzanie...' : 'Kup bilet' }}
+          </button>
+        </div>
+      </section>
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, computed } from 'vue'
-
-const zones = [
-  { name: 'I', multiplier: 1 },
-  { name: 'II', multiplier: 1.2 },
-  { name: 'III', multiplier: 1.4 },
-  { name: 'I + II', multiplier: 1.6 },
-  { name: 'II + III', multiplier: 1.8 },
-  { name: 'I + II + III', multiplier: 2 }
-]
-
-const types = [
-  { name: 'Normalny', base: 10 },
-  { name: 'Ulgowy', base: 6 }
-]
-
-const zone = ref(null)
-const type = ref(null)
-const dateFrom = ref('')
-const dateTo = ref('')
-
-const days = computed(() => {
-  if (!dateFrom.value || !dateTo.value) return 0
-  const a = new Date(dateFrom.value)
-  const b = new Date(dateTo.value)
-  const diff = b - a
-  return diff >= 0 ? diff / 86400000 + 1 : 0
-})
-
-const canCalculate = computed(() =>
-  zone.value && type.value && days.value > 0
-)
-
-const price = computed(() =>
-  Math.round(days.value * type.value.base * zone.value.multiplier)
-)
-
-function handlePayment() {
-  // Payment handling logic
-  alert('Płatność została przetworzona!')
-}
-</script>
 
 <style scoped>
 .wrapper {
   min-height: 100vh;
   background-color: var(--background-primary);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
   padding: 40px 16px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.card {
-  width: 100%;
-  max-width: 600px;
-  background: var(--card-background);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 60px var(--shadow-color);
-  color: var(--text-main);
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 36px;
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-h1 {
+.page-header h1 {
   font-size: 32px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 8px 0;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: var(--text-additional);
   margin: 0;
 }
 
-form {
+.balance-badge {
   display: flex;
-  flex-direction: column;
-  gap: 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--background-additional);
+  border-radius: 12px;
+  font-weight: 600;
+  color: var(--background-main);
 }
 
-.form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.balance-badge i {
+  font-size: 18px;
+}
+
+.tickets-section {
+  margin-bottom: 40px;
+}
+
+.tickets-section h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-additional);
+}
+
+.loading-state i,
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: var(--text-additional);
+}
+
+.loading-state i {
+  color: var(--background-main);
+}
+
+.tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.purchase-section {
+  margin-top: 40px;
+}
+
+.card {
+  background: var(--card-background);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .section-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  margin-bottom: 24px;
 }
 
-.step-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--background-main);
-  color: var(--text-secondary);
-  border-radius: 50%;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-h2 {
-  font-size: 18px;
+.section-header h2 {
+  font-size: 24px;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
 }
 
-.options {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.zones-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 10px;
-}
-
-.types-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-}
-
-.option-card {
-  position: relative;
+.clear-button {
+  background: none;
+  border: none;
+  color: var(--text-additional);
   cursor: pointer;
+  font-size: 20px;
+  padding: 8px;
+  transition: all 0.2s ease;
 }
 
-.option-card input {
-  display: none;
+.clear-button:hover {
+  color: var(--text-primary);
+  transform: scale(1.1);
 }
 
-.option-card input:checked+.option-content {
-  background: var(--background-main);
-  color: var(--text-secondary);
-  border-color: var(--background-main);
-  box-shadow: 0 4px 12px rgba(0, 31, 63, 0.3);
-}
-
-.option-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 12px;
-  border: 2px solid var(--border-color);
+.selected-ticket-summary {
+  background: var(--background-additional);
+  padding: 16px;
   border-radius: 12px;
-  transition: all 0.3s ease;
-  text-align: center;
-  gap: 4px;
-  color: var(--text-main);
+  margin-bottom: 24px;
 }
 
-.option-card:hover .option-content {
-  border-color: var(--background-main);
-}
-
-.zone-badge {
-  font-size: 16px;
-  font-weight: 700;
-  color: inherit;
-}
-
-.multiplier {
-  font-size: 12px;
-  opacity: 0.7;
-  color: inherit;
-}
-
-.type-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: inherit;
-}
-
-.base-price {
-  font-size: 12px;
-  opacity: 0.7;
-  color: inherit;
-}
-
-.dates {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.date-input-group {
+.summary-row {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.date-input-group label {
-  font-size: 13px;
-  font-weight: 600;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
   color: var(--text-primary);
 }
 
-input[type="date"] {
-  padding: 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 10px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-  font-family: inherit;
-  background: var(--background-primary);
-  color: var(--text-main);
+.summary-row strong {
+  color: var(--background-main);
+  font-size: 18px;
 }
 
-input[type="date"]:focus {
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.form-group input[type='datetime-local'] {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--background-primary);
+  color: var(--text-main);
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
   outline: none;
   border-color: var(--background-main);
   box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
 }
 
-.days-info {
+.duration-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px;
   background: var(--background-tertiary);
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: 8px;
+  margin-bottom: 20px;
   color: var(--background-main);
-  text-align: center;
-  border: 1px solid var(--border-color);
+  font-size: 14px;
 }
 
-.price-summary {
-  padding: 24px;
-  background: var(--background-additional);
-  border-radius: 14px;
-  text-align: center;
+.concession-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.concession-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
   border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.summary-label {
-  font-size: 13px;
+.concession-option:hover {
+  border-color: var(--background-main);
+}
+
+.concession-option.active {
+  border-color: var(--background-main);
+  background: var(--background-additional);
+}
+
+.concession-option input[type='radio'] {
+  cursor: pointer;
+}
+
+.concession-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.concession-label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.concession-description {
+  font-size: 12px;
   color: var(--text-additional);
-  margin-bottom: 8px;
-  font-weight: 500;
 }
 
-.summary-price {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--background-main);
+.warning-message,
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
 }
 
-.pay-button {
+.warning-message {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ff9800;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.error-message {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.purchase-button {
+  width: 100%;
   padding: 16px;
   background: var(--background-main);
   color: var(--text-secondary);
@@ -348,47 +421,33 @@ input[type="date"]:focus {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 31, 63, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.pay-button:hover:not(:disabled) {
+.purchase-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 31, 63, 0.4);
 }
 
-.pay-button:disabled {
+.purchase-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
 }
 
-.note {
-  margin-top: 16px;
-  font-size: 12px;
-  color: var(--text-additional);
-  text-align: center;
-  margin-bottom: 0;
-}
-
-@media (max-width: 480px) {
-  .card {
-    padding: 24px;
-  }
-
-  h1 {
+@media (max-width: 768px) {
+  .page-header h1 {
     font-size: 24px;
   }
 
-  .zones-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .types-grid {
+  .tickets-grid {
     grid-template-columns: 1fr;
   }
 
-  .dates {
-    grid-template-columns: 1fr;
+  .card {
+    padding: 20px;
   }
 }
 </style>

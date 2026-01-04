@@ -9,6 +9,10 @@ export class TicketMapper {
       record.createdAt,
       record.updatedAt,
       record.deletedAt,
+      {
+        value: record.validTimeValue,
+        unit: record.validTimeUnit,
+      },
       currentPrice
     );
   }
@@ -17,6 +21,8 @@ export class TicketMapper {
     return {
       id: ticket.id,
       name: ticket.name,
+      validTimeValue: ticket.validTime.value,
+      validTimeUnit: ticket.validTime.unit,
       createdAt: ticket.createdAt,
       updatedAt: ticket.updatedAt,
       deletedAt: ticket.deletedAt,

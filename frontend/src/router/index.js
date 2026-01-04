@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const routes = [
   {
@@ -45,6 +46,35 @@ const routes = [
         name: 'Login',
         component: () => import('@/views/Login.vue'),
       },
+      {
+        path: 'register',
+        name: 'Register',
+        component: () => import('@/views/Register.vue'),
+      },
+      // {
+      //   path: 'profile',
+      //   name: 'Profile',
+      //   component: () => import('@/views/Profile.vue'),
+      //   meta: { requiresAuth: true },
+      // },
+      // {
+      //   path: 'orders',
+      //   name: 'OrderHistory',
+      //   component: () => import('@/views/OrderHistory.vue'),
+      //   meta: { requiresAuth: true },
+      // },
+      // {
+      //   path: 'recharge',
+      //   name: 'RechargeBalance',
+      //   component: () => import('@/views/RechargeBalance.vue'),
+      //   meta: { requiresAuth: true },
+      // },
+      // {
+      //   path: 'recharge-history',
+      //   name: 'RechargeHistory',
+      //   component: () => import('@/views/RechargeHistory.vue'),
+      //   meta: { requiresAuth: true },
+      // },
     ],
   },
   {
@@ -66,6 +96,23 @@ const router = createRouter({
     }
     return savedPosition || { top: 0 };
   },
+});
+
+// Navigation guard for authentication
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+
+  // Initialize auth state from localStorage on first load
+  if (!authStore.initialized) {
+    authStore.initializeAuth();
+  }
+
+  // Check if route requires authentication
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next({ name: 'Login', query: { redirect: to.fullPath } });
+  } else {
+    next();
+  }
 });
 
 export default router;

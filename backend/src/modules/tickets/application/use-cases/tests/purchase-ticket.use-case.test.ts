@@ -14,6 +14,7 @@ const createUserMock = (balance: number = 10000) =>
   new User(
     'user-123',
     '12345678901',
+    'test@mail.com',
     'password-hash',
     'password-salt',
     'John',
@@ -25,7 +26,15 @@ const createUserMock = (balance: number = 10000) =>
   );
 
 const createTicketMock = (price: number = 500) =>
-  new Ticket('ticket-123', 'Monthly Pass', new Date(), new Date(), null, price);
+  new Ticket(
+    'ticket-123',
+    'Monthly Pass',
+    new Date(),
+    new Date(),
+    null,
+    { value: 20, unit: 'minutes' },
+    price
+  );
 
 const createTicketOrderMock = () =>
   new TicketOrder(
@@ -42,6 +51,7 @@ const createTicketOrderMock = () =>
 const userRepositoryMock: IUserRepository = {
   findById: vi.fn(),
   findByPesel: vi.fn(),
+  findByEmail: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
@@ -166,7 +176,15 @@ describe('PurchaseTicketUseCase', () => {
 
   it('Handles ticket with no price (free ticket)', async ({ expect }) => {
     const user = createUserMock(0);
-    const ticket = new Ticket('ticket-123', 'Free Pass', new Date(), new Date(), null, undefined);
+    const ticket = new Ticket(
+      'ticket-123',
+      'Free Pass',
+      new Date(),
+      new Date(),
+      null,
+      { value: 20, unit: 'minutes' },
+      undefined
+    );
     const order = createTicketOrderMock();
 
     vi.mocked(userRepositoryMock.findById).mockResolvedValue(user);

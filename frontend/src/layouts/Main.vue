@@ -1,13 +1,16 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '@/stores/auth';
 
 import NavBarButton from '@/components/NavBarButton.vue';
 import SpecialButton from '@/components/Home/SpecialButton.vue';
 import NavBarButtonDropdown from '@/components/NavBarButtonDropdown.vue';
 import Communication from '@/components/InfoPopUp/Announcement.vue';
+import UserMenu from '@/components/UserMenu.vue';
 
 const { t, locale } = useI18n();
+const authStore = useAuthStore();
 
 const pages = computed(() => [
   { label: t('nav.tickets'), path: '/tickets' },
@@ -68,7 +71,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <router-link :to="{ path: '/login' }">
+          <UserMenu v-if="authStore.isAuthenticated" />
+          <router-link v-else :to="{ path: '/login' }">
             <SpecialButton :title="t('loginButton')" />
           </router-link>
           <div class="phone">

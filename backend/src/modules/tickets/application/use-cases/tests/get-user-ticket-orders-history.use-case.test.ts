@@ -14,6 +14,7 @@ const createUserMock = () =>
   new User(
     'user-123',
     '12345678901',
+    'test@mail.com',
     'password-hash',
     'password-salt',
     'John',
@@ -39,17 +40,15 @@ const createTicketOrderMock = (overrides?: Partial<TicketOrder>) =>
 const createPaginatedResultMock = (
   data: TicketOrder[] = [],
   options?: { limit?: number; offset?: number; total?: number }
-) =>
-  new PaginatedResult(
-    data,
-    options?.limit ?? 20,
-    options?.offset ?? 0,
-    options?.total ?? data.length
-  );
+) => {
+  const mockPagination = new Pagination(options?.limit ?? 20, options?.offset ?? 0);
+  return new PaginatedResult(data, mockPagination, options?.total ?? data.length);
+};
 
 const userRepositoryMock: IUserRepository = {
   findById: vi.fn(),
   findByPesel: vi.fn(),
+  findByEmail: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),

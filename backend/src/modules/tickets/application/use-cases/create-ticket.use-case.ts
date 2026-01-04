@@ -26,10 +26,14 @@ export class CreateTicketUseCase {
   }
 
   async execute(dto: CreateTicketDto): Promise<Ticket> {
-    this.logger.info('Creating new ticket', { name: dto.name, price: dto.price });
+    this.logger.info('Creating new ticket', {
+      name: dto.name,
+      price: dto.price,
+      validTime: dto.validTime
+    });
 
     const ticketId = uuidv4();
-    const ticket = Ticket.create(ticketId, dto.name);
+    const ticket = Ticket.create(ticketId, dto.name, dto.validTime);
     const createdTicket = await this.ticketRepository.create(ticket);
 
     const ticketPrice = TicketPrice.create(ticketId, dto.price);
@@ -39,6 +43,7 @@ export class CreateTicketUseCase {
       id: createdTicket.id,
       name: createdTicket.name,
       price: dto.price,
+      validTime: dto.validTime,
     });
 
     return new Ticket(
@@ -47,6 +52,7 @@ export class CreateTicketUseCase {
       createdTicket.createdAt,
       createdTicket.updatedAt,
       createdTicket.deletedAt,
+      dto.validTime,
       dto.price
     );
   }
