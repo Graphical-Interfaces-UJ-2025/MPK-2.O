@@ -9,28 +9,11 @@ export class Track {
     public readonly deletedAt: Date | null = null
   ) {}
 
-  static create(
-    id: number,
-    name: string,
-    transportRefNumber: string,
-    stationIds: string[]
-  ): Track {
-    return new Track(
-      id,
-      name,
-      transportRefNumber,
-      [...stationIds],
-      new Date(),
-      new Date(),
-      null
-    );
+  static create(id: number, name: string, transportRefNumber: string, stationIds: string[]): Track {
+    return new Track(id, name, transportRefNumber, [...stationIds], new Date(), new Date(), null);
   }
 
-  update(
-    name: string,
-    transportRefNumber: string,
-    stationIds: string[]
-  ): Track {
+  update(name: string, transportRefNumber: string, stationIds: string[]): Track {
     return new Track(
       this.id,
       name,
@@ -59,8 +42,6 @@ export class Track {
   }
 
   get finalStationId(): string | undefined {
-    return this.stationIds.length > 0
-      ? this.stationIds[this.stationIds.length - 1]
-      : undefined;
+    return this.stationIds.length > 0 ? this.stationIds[this.stationIds.length - 1] : undefined;
   }
 }
