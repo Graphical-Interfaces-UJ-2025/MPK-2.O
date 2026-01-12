@@ -83,17 +83,18 @@ onUnmounted(() => {
 <style scoped>
 .user-menu {
   position: relative;
+  z-index: 9999;
 }
 
 .user-menu-button {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 16px;
+  padding: 10px 18px;
   background: var(--background-main);
   color: var(--text-secondary);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -122,16 +123,17 @@ onUnmounted(() => {
 }
 
 .dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
+  position: fixed;
+  top: 70px;
+  right: 20px;
   min-width: 280px;
   background: var(--background-secondary);
   border-radius: 12px;
-  box-shadow: 0 10px 30px var(--shadow-color);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   padding: 8px;
-  z-index: 1000;
+  z-index: 99999;
   animation: slideDown 0.3s ease;
+  border: 1px solid var(--border-color);
 }
 
 @keyframes slideDown {
@@ -229,8 +231,10 @@ onUnmounted(() => {
   }
 
   .dropdown {
-    right: -10px;
-    min-width: 260px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    width: calc(100% - 20px);
   }
 }
 </style>

@@ -144,6 +144,7 @@ export class AuthController {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
+          balance: user.balance,
         },
       });
     } catch (error) {

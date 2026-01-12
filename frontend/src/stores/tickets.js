@@ -12,8 +12,6 @@ export const useTicketsStore = defineStore('tickets', {
     purchaseForm: {
       ticketId: '',
       validFrom: '',
-      validTo: '',
-      concessionId: 0,
     },
     isLoading: false,
     error: null,
@@ -24,10 +22,7 @@ export const useTicketsStore = defineStore('tickets', {
       const authStore = useAuthStore();
       if (!state.selectedTicket || !authStore.user) return false;
 
-      const formValid = state.purchaseForm.ticketId
-        && state.purchaseForm.validFrom
-        && state.purchaseForm.validTo;
-
+      const formValid = state.purchaseForm.ticketId && state.purchaseForm.validFrom;
       const sufficientBalance = authStore.user.balance >= state.selectedTicket.price;
 
       return formValid && sufficientBalance;
@@ -39,19 +34,15 @@ export const useTicketsStore = defineStore('tickets', {
       return `${pln} PLN`;
     },
 
-    purchaseDuration() {
-      const { validFrom, validTo } = this.purchaseForm;
-      if (!validFrom || !validTo) return 0;
+    // Monthly ticket - always 30 days
+    purchaseDuration: () => 30,
 
-      const from = new Date(validFrom);
-      const to = new Date(validTo);
-      const diffMs = to - from;
-
-      if (diffMs < 0) return 0;
-
-      // Calculate days
-      const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      return days;
+    // Calculate validTo date (30 days from validFrom)
+    calculatedValidTo: (state) => {
+      if (!state.purchaseForm.validFrom) return '';
+      const from = new Date(state.purchaseForm.validFrom);
+      const to = new Date(from.getTime() + 30 * 24 * 60 * 60 * 1000);
+      return to.toISOString().slice(0, 10);
     },
   },
 
@@ -83,12 +74,9 @@ export const useTicketsStore = defineStore('tickets', {
         this.selectedTicket = ticket;
         this.purchaseForm.ticketId = ticketId;
 
-        // Initialize dates to now and +1 day
-        const now = new Date();
-        const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-        this.purchaseForm.validFrom = now.toISOString().slice(0, 16);
-        this.purchaseForm.validTo = tomorrow.toISOString().slice(0, 16);
+        // Initialize validFrom to today
+        const today = new Date();
+        this.purchaseForm.validFrom = today.toISOString().slice(0, 10);
       }
     },
 
@@ -98,8 +86,6 @@ export const useTicketsStore = defineStore('tickets', {
       this.purchaseForm = {
         ticketId: '',
         validFrom: '',
-        validTo: '',
-        concessionId: 0,
       };
       this.error = null;
     },
@@ -117,23 +103,17 @@ export const useTicketsStore = defineStore('tickets', {
         return false;
       }
 
-      if (!this.purchaseForm.validFrom || !this.purchaseForm.validTo) {
+      if (!this.purchaseForm.validFrom) {
         return false;
       }
 
       const from = new Date(this.purchaseForm.validFrom);
-      const to = new Date(this.purchaseForm.validTo);
-      const now = new Date();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
       // Check if validFrom is not in the past
-      if (from < now) {
+      if (from < today) {
         this.error = 'Data rozpoczęcia nie może być w przeszłości';
-        return false;
-      }
-
-      // Check if validTo is after validFrom
-      if (to <= from) {
-        this.error = 'Data zakończenia musi być późniejsza niż data rozpoczęcia';
         return false;
       }
 
@@ -168,13 +148,12 @@ export const useTicketsStore = defineStore('tickets', {
           throw new Error('Niewystarczające saldo');
         }
 
-        // Call API
+        // Call API with calculated validTo (30 days from validFrom)
         await apiClient.tickets.postApiTicketsPurchase({
           requestBody: {
             ticketId: this.purchaseForm.ticketId,
             validFrom: this.purchaseForm.validFrom,
-            validTo: this.purchaseForm.validTo,
-            concessionId: this.purchaseForm.concessionId,
+            validTo: this.calculatedValidTo,
           },
         });
 

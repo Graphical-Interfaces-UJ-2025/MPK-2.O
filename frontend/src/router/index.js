@@ -22,6 +22,16 @@ const routes = [
         component: () => import('@/views/Lines.vue'),
       },
       {
+        path: 'lines/:lineNumber',
+        name: 'LineDetails',
+        component: () => import('@/views/LineDetails.vue'),
+      },
+      {
+        path: 'schedule',
+        name: 'Schedule',
+        component: () => import('@/views/Schedule.vue'),
+      },
+      {
         path: 'stops',
         name: 'Stops',
         component: () => import('@/views/Stops.vue'),
@@ -51,30 +61,30 @@ const routes = [
         name: 'Register',
         component: () => import('@/views/Register.vue'),
       },
-      // {
-      //   path: 'profile',
-      //   name: 'Profile',
-      //   component: () => import('@/views/Profile.vue'),
-      //   meta: { requiresAuth: true },
-      // },
-      // {
-      //   path: 'orders',
-      //   name: 'OrderHistory',
-      //   component: () => import('@/views/OrderHistory.vue'),
-      //   meta: { requiresAuth: true },
-      // },
-      // {
-      //   path: 'recharge',
-      //   name: 'RechargeBalance',
-      //   component: () => import('@/views/RechargeBalance.vue'),
-      //   meta: { requiresAuth: true },
-      // },
-      // {
-      //   path: 'recharge-history',
-      //   name: 'RechargeHistory',
-      //   component: () => import('@/views/RechargeHistory.vue'),
-      //   meta: { requiresAuth: true },
-      // },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/Profile.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'orders',
+        name: 'OrderHistory',
+        component: () => import('@/views/OrderHistory.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'recharge',
+        name: 'RechargeBalance',
+        component: () => import('@/views/RechargeBalance.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'recharge-history',
+        name: 'RechargeHistory',
+        component: () => import('@/views/RechargeHistory.vue'),
+        meta: { requiresAuth: true },
+      },
     ],
   },
   {
@@ -108,7 +118,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // Check if route requires authentication
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  if (to.meta.requiresAuth && !localStorage.getItem('token')) {
     next({ name: 'Login', query: { redirect: to.fullPath } });
   } else {
     next();
