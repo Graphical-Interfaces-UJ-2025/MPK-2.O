@@ -42,7 +42,6 @@ const createTicketOrderMock = () =>
     'ticket-123',
     new Date(),
     new Date(),
-    1,
     new Date(),
     500,
     'Monthly Pass'
@@ -100,7 +99,6 @@ describe('PurchaseTicketUseCase', () => {
     ticketId: 'ticket-123',
     validFrom: new Date(),
     validTo: new Date(),
-    concessionId: 1,
   });
 
   it('Fails if user does not exist', async ({ expect }) => {

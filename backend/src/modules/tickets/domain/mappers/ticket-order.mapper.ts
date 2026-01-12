@@ -11,7 +11,6 @@ export class TicketOrderMapper {
       record.ticketId,
       record.validFrom,
       record.validTo,
-      record.concessionId,
       record.orderedAt,
       record.price,
       ticketName
@@ -24,7 +23,6 @@ export class TicketOrderMapper {
       ticketId: order.ticketId,
       validFrom: order.validFrom,
       validTo: order.validTo,
-      concessionId: order.concessionId,
       orderedAt: order.orderedAt,
       price: order.price,
     };

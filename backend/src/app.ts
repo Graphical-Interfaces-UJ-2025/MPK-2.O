@@ -21,15 +21,16 @@ const protectedRoutes: ProtectedRouteConfig[] = [
   { path: '/api/stations', methods: ['*'] },
   { path: '/api/transports', methods: ['*'] },
   { path: '/api/tracks', methods: ['*'] },
+  { path: '/api/transactions', methods: ['*'] },
 ];
 
 const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
-  {
-    path: '/api/tickets/orders-history/*',
-    methods: ['GET'],
-    roles: ['admin', 'application_manager'],
-  },
-  { path: '/api/tickets/orders-history', methods: ['GET'], roles: ['user'] },
+  // {
+  //   path: '/api/tickets/orders-history/*',
+  //   methods: ['GET'],
+  //   roles: ['admin', 'application_manager'],
+  // },
+  { path: '/api/tickets', methods: ['GET'], roles: ['user'] },
   // { path: '/api/tickets', methods: ['POST'], roles: ['admin', 'application_manager'] },
   { path: '/api/tickets/', methods: ['DELETE'], roles: ['admin', 'application_manager'] },
   {
@@ -37,7 +38,7 @@ const roleProtectedRoutes: RoleProtectedRouteConfig[] = [
     methods: ['GET'],
     roles: ['admin', 'application_manager'],
   },
-  { path: '/api/users/balance/recharges', methods: ['GET'], roles: ['user'] },
+  // { path: '/api/users/balance/recharges', methods: ['GET'], roles: ['user'] },
   // Station routes - read for admin and app_manager, mutations only for admin
   { path: '/api/stations', methods: ['GET'], roles: ['admin', 'application_manager'] },
   { path: '/api/stations', methods: ['POST'], roles: ['admin'] },

@@ -2,8 +2,10 @@ import 'reflect-metadata';
 import { beforeEach, describe, it, vi } from 'vitest';
 import { ILogger } from '../../../../shared/application/services/logger.interface';
 import { ITransactionRepository } from '../../repositories/transaction.repository.interface';
+import { IUserRepository } from '../../../../user/application/repositories/user.repository.interface';
 import { ProceedBalanceRechargeUseCase } from '../proceed-balance-recharge.use-case';
 import { Transaction, TransactionStatus } from '../../../domain/entities/transaction.entity';
+import { User } from '../../../../user/domain/entities/user.entity';
 import { TRANSACTION_ERRORS } from '../../../constants';
 
 const transactionRepositoryMock: ITransactionRepository = {
@@ -11,6 +13,16 @@ const transactionRepositoryMock: ITransactionRepository = {
   findByUserId: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
+};
+
+const userRepositoryMock: IUserRepository = {
+  findById: vi.fn(),
+  findByPesel: vi.fn(),
+  findByEmail: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+  findAll: vi.fn(),
 };
 
 const createTransactionMock = (status: TransactionStatus = 'COMPLETED') =>
@@ -21,6 +33,21 @@ const createTransactionMock = (status: TransactionStatus = 'COMPLETED') =>
     6000,
     '741b2785-c9ae-4ca0-8c45-a1139f56d0df',
     status,
+    new Date()
+  );
+
+const createUserMock = (balance: number = 10000) =>
+  new User(
+    'c9e224a2-57dc-4775-8ce5-3440354bbfe7',
+    '12345678901',
+    'test@mail.com',
+    'password-hash',
+    'password-salt',
+    'John',
+    'Doe',
+    balance,
+    'user',
+    new Date(),
     new Date()
   );
 
@@ -40,7 +67,11 @@ describe('ProceedBalanceRechargeUseCase', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    useCase = new ProceedBalanceRechargeUseCase(transactionRepositoryMock, loggerMock);
+    useCase = new ProceedBalanceRechargeUseCase(
+      transactionRepositoryMock,
+      userRepositoryMock,
+      loggerMock
+    );
   });
 
   it('Fails if transaction does not exists', async ({ expect }) => {
@@ -75,9 +106,15 @@ describe('ProceedBalanceRechargeUseCase', () => {
     vi.mocked(transactionRepositoryMock.findById).mockResolvedValue(
       createTransactionMock('PENDING')
     );
+    vi.mocked(userRepositoryMock.findById).mockResolvedValue(createUserMock(10000));
 
     await useCase.execute(mockTransactionId);
 
+    expect(userRepositoryMock.update).toBeCalledWith(
+      expect.objectContaining({
+        balance: 16000,
+      })
+    );
     expect(transactionRepositoryMock.update).toBeCalledWith(
       expect.objectContaining({
         status: 'COMPLETED',

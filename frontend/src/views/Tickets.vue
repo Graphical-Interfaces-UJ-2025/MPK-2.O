@@ -18,12 +18,6 @@ const handleSelectTicket = (ticketId) => {
 const handlePurchase = async () => {
   await ticketsStore.purchaseTicket();
 };
-
-const concessions = [
-  { id: 0, label: 'Normalny', description: 'Bilet pełnopłatny' },
-  { id: 1, label: 'Ulgowy - Student', description: 'Bilet dla studentów' },
-  { id: 2, label: 'Ulgowy - Senior', description: 'Bilet dla seniorów' },
-];
 </script>
 
 <template>
@@ -85,54 +79,24 @@ const concessions = [
             </div>
           </div>
 
-          <!-- Date Range Picker -->
+          <!-- Valid From Date -->
           <div class="form-group">
-            <label>Ważny od</label>
+            <label>
+              <i class="fa-solid fa-calendar"></i>
+              Ważny od
+            </label>
             <input
-              type="datetime-local"
+              type="date"
               :value="ticketsStore.purchaseForm.validFrom"
               @input="ticketsStore.updatePurchaseForm('validFrom', $event.target.value)"
             />
           </div>
 
-          <div class="form-group">
-            <label>Ważny do</label>
-            <input
-              type="datetime-local"
-              :value="ticketsStore.purchaseForm.validTo"
-              @input="ticketsStore.updatePurchaseForm('validTo', $event.target.value)"
-            />
-          </div>
-
-          <!-- Duration Display -->
-          <div v-if="ticketsStore.purchaseDuration > 0" class="duration-info">
-            <i class="fa-solid fa-clock"></i>
-            <span>Okres ważności: <strong>{{ ticketsStore.purchaseDuration }} dni</strong></span>
-          </div>
-
-          <!-- Concession Selection -->
-          <div class="form-group">
-            <label>Typ biletu</label>
-            <div class="concession-options">
-              <label
-                v-for="concession in concessions"
-                :key="concession.id"
-                class="concession-option"
-                :class="{ active: ticketsStore.purchaseForm.concessionId === concession.id }"
-              >
-                <input
-                  type="radio"
-                  :value="concession.id"
-                  :checked="ticketsStore.purchaseForm.concessionId === concession.id"
-                  @change="ticketsStore.updatePurchaseForm('concessionId', concession.id)"
-                />
-                <div class="concession-content">
-                  <span class="concession-label">{{ concession.label }}</span>
-                  <span class="concession-description">{{ concession.description }}</span>
-                </div>
-              </label>
-            </div>
-          </div>
+          <!-- Monthly Ticket Info -->
+          <!-- <div class="ticket-info">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>Bilet miesięczny ważny przez 30 dni od daty rozpoczęcia</span>
+          </div> -->
 
           <!-- Balance Warning -->
           <div v-if="!ticketsStore.checkSufficientBalance(ticketsStore.selectedTicket.price)" class="warning-message">
@@ -305,86 +269,57 @@ const concessions = [
 }
 
 .form-group label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.form-group input[type='datetime-local'] {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 14px;
-  background: var(--background-primary);
-  color: var(--text-main);
-  transition: all 0.3s ease;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: var(--background-main);
-  box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.1);
-}
-
-.duration-info {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.form-group label i {
+  color: var(--background-main);
+  font-size: 16px;
+}
+
+.form-group input[type='date'] {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  background: var(--background-primary);
+  color: var(--text-main);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.form-group input[type='date']:hover {
+  border-color: var(--background-main);
+}
+
+.form-group input[type='date']:focus {
+  outline: none;
+  border-color: var(--background-main);
+  box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.15);
+}
+
+.ticket-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
   background: var(--background-tertiary);
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 20px;
   color: var(--background-main);
   font-size: 14px;
 }
 
-.concession-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.concession-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.concession-option:hover {
-  border-color: var(--background-main);
-}
-
-.concession-option.active {
-  border-color: var(--background-main);
-  background: var(--background-additional);
-}
-
-.concession-option input[type='radio'] {
-  cursor: pointer;
-}
-
-.concession-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.concession-label {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.concession-description {
-  font-size: 12px;
-  color: var(--text-additional);
+.ticket-info i {
+  font-size: 18px;
 }
 
 .warning-message,

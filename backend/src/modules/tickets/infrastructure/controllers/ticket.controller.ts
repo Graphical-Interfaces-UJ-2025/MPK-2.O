@@ -326,7 +326,6 @@ export class TicketController {
           validTo: o.validTo,
           orderedAt: o.orderedAt,
           price: o.price,
-          concessionId: o.concessionId,
         })),
         pagination: {
           total: result.total,
@@ -417,7 +416,6 @@ export class TicketController {
           validTo: o.validTo,
           orderedAt: o.orderedAt,
           price: o.price,
-          concessionId: o.concessionId,
         })),
         pagination: {
           total: result.total,
@@ -480,14 +478,13 @@ export class TicketController {
   async purchase(req: Request, res: Response): Promise<void> {
     try {
       const { id: userId } = (req as RequestWithUser).user;
-      const { ticketId, validFrom, validTo, concessionId } = req.body;
+      const { ticketId, validFrom, validTo } = req.body;
 
       const order = await this.purchaseTicketUseCase.execute({
         userId,
         ticketId,
         validFrom: new Date(validFrom),
         validTo: new Date(validTo),
-        concessionId,
       });
 
       res.status(201).json({
@@ -499,7 +496,6 @@ export class TicketController {
           validTo: order.validTo,
           orderedAt: order.orderedAt,
           price: order.price,
-          concessionId: order.concessionId,
         },
       });
     } catch (error) {

@@ -85,9 +85,6 @@ export const ticketOrder = pgTable(
       .references(() => ticket.id, { onDelete: 'no action', onUpdate: 'no action' }),
     validFrom: timestamp('valid_from').notNull(),
     validTo: timestamp('valid_to').notNull(),
-    concessionId: integer('concession_id')
-      .notNull()
-      .references(() => concession.id, { onDelete: 'no action', onUpdate: 'no action' }),
     orderedAt: timestamp('ordered_at').notNull().defaultNow(),
     price: integer('price'),
   },

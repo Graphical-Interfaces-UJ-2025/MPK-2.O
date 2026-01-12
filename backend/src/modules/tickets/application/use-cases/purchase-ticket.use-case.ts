@@ -20,7 +20,6 @@ export interface PurchaseTicketInput {
   ticketId: string;
   validFrom: Date;
   validTo: Date;
-  concessionId: number;
 }
 
 @injectable()
@@ -57,6 +56,7 @@ export class PurchaseTicketUseCase {
 
     const price = ticket.currentPrice ?? 0;
 
+    console.log(user.balance, price);
     if (user.balance < price) {
       this.logger.warn('Purchase failed: Insufficient balance', {
         userId: input.userId,
@@ -74,7 +74,6 @@ export class PurchaseTicketUseCase {
       input.ticketId,
       input.validFrom,
       input.validTo,
-      input.concessionId,
       new Date(),
       price,
       ticket.name

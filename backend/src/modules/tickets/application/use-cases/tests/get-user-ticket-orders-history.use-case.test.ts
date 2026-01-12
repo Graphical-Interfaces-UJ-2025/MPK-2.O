@@ -31,7 +31,6 @@ const createTicketOrderMock = (overrides?: Partial<TicketOrder>) =>
     overrides?.ticketId ?? 'ticket-123',
     overrides?.validFrom ?? new Date(),
     overrides?.validTo ?? new Date(),
-    overrides?.concessionId ?? 1,
     overrides?.orderedAt ?? new Date(),
     overrides?.price ?? 500,
     overrides?.ticketName ?? 'Monthly Pass'
