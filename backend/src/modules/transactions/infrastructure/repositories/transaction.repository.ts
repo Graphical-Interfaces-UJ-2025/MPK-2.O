@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { ITransactionRepository } from '../../application/repositories/transaction.repository.interface';
 import { Transaction } from '../../domain/entities/transaction.entity';
 import { transactions } from '../database/models/transaction.model';
@@ -14,7 +14,11 @@ export class TransactionRepository implements ITransactionRepository {
   }
 
   async findByUserId(userId: string): Promise<Transaction[]> {
-    const records = await db.select().from(transactions).where(eq(transactions.userId, userId));
+    const records = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.userId, userId))
+      .orderBy(desc(transactions.createdAt));
     return records.map(TransactionMapper.toDomain);
   }
 

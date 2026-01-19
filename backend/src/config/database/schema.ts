@@ -74,22 +74,20 @@ export const concession = pgTable('concession', {
 export type ConcessionRecord = typeof concession.$inferSelect;
 export type NewConcessionRecord = typeof concession.$inferInsert;
 
-export const ticketOrder = pgTable(
-  'ticket_order',
-  {
-    userId: uuid('user_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'no action', onUpdate: 'no action' }),
-    ticketId: uuid('ticket_id')
-      .notNull()
-      .references(() => ticket.id, { onDelete: 'no action', onUpdate: 'no action' }),
-    validFrom: timestamp('valid_from').notNull(),
-    validTo: timestamp('valid_to').notNull(),
-    orderedAt: timestamp('ordered_at').notNull().defaultNow(),
-    price: integer('price'),
-  },
-  (table) => [primaryKey({ columns: [table.userId, table.ticketId] })]
-);
+export const ticketOrder = pgTable('ticket_order', {
+  id: uuid('id').primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'no action', onUpdate: 'no action' }),
+  ticketId: uuid('ticket_id')
+    .notNull()
+    .references(() => ticket.id, { onDelete: 'no action', onUpdate: 'no action' }),
+  validFrom: timestamp('valid_from').notNull(),
+  validTo: timestamp('valid_to').notNull(),
+  orderedAt: timestamp('ordered_at').notNull().defaultNow(),
+  price: integer('price'),
+  isRefunded: boolean('is_refunded').notNull().default(false),
+});
 
 export type TicketOrderRecord = typeof ticketOrder.$inferSelect;
 export type NewTicketOrderRecord = typeof ticketOrder.$inferInsert;

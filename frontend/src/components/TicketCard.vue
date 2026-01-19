@@ -16,6 +16,18 @@ const formatPrice = (grosze) => {
   return (grosze / 100).toFixed(2);
 };
 
+const formatDuration = (validTime) => {
+  if (!validTime) return '';
+
+  const unitLabels = {
+    minutes: validTime.value === 1 ? 'minuta' : validTime.value < 5 ? 'minuty' : 'minut',
+    days: validTime.value === 1 ? 'dzień' : 'dni',
+    months: validTime.value === 1 ? 'miesiąc' : validTime.value < 5 ? 'miesiące' : 'miesięcy',
+  };
+
+  return `${validTime.value} ${unitLabels[validTime.unit]}`;
+};
+
 const handleSelect = () => {
   emit('select', props.ticket.id);
 };
@@ -30,6 +42,10 @@ const handleSelect = () => {
     <div class="ticket-price">
       <span class="price-amount">{{ formatPrice(ticket.price) }}</span>
       <span class="price-currency">PLN</span>
+    </div>
+    <div v-if="ticket.validTime" class="ticket-duration">
+      <i class="fa-solid fa-clock"></i>
+      <span>Ważność: {{ formatDuration(ticket.validTime) }}</span>
     </div>
     <button @click="handleSelect" class="select-button" :class="{ selected }">
       <i class="fa-solid" :class="selected ? 'fa-check' : 'fa-arrow-right'"></i>
@@ -100,6 +116,23 @@ const handleSelect = () => {
   font-size: 14px;
   color: var(--text-additional);
   font-weight: 600;
+}
+
+.ticket-duration {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--background-primary);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.ticket-duration i {
+  color: var(--background-main);
+  font-size: 14px;
 }
 
 .select-button {

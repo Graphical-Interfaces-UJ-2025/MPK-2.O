@@ -78,8 +78,8 @@ const fetchTransactions = async () => {
   }
 };
 
-const rechargeTransactions = computed(() => {
-  return transactions.value.filter((t) => t.type === 'RECHARGE');
+const rechargeAndRefundTransactions = computed(() => {
+  return transactions.value.filter((t) => t.type === 'RECHARGE' || t.type === 'TICKET_REFUND');
 });
 
 onMounted(() => {
@@ -91,8 +91,8 @@ onMounted(() => {
   <div class="wrapper">
     <div class="container">
       <div class="page-header">
-        <h1>Historia doładowań</h1>
-        <p class="subtitle">Twoje doładowania konta</p>
+        <h1>Historia doładowań i zwrotów</h1>
+        <p class="subtitle">Twoje doładowania konta i zwroty biletów</p>
       </div>
 
       <div v-if="isLoading" class="loading-state">
@@ -100,9 +100,9 @@ onMounted(() => {
         <p>Ładowanie...</p>
       </div>
 
-      <div v-else-if="rechargeTransactions.length === 0" class="empty-state">
+      <div v-else-if="rechargeAndRefundTransactions.length === 0" class="empty-state">
         <i class="fa-solid fa-wallet"></i>
-        <p>Brak doładowań</p>
+        <p>Brak transakcji</p>
         <router-link to="/recharge" class="action-button primary">
           Doładuj konto
         </router-link>
@@ -110,7 +110,7 @@ onMounted(() => {
 
       <div v-else class="transactions-list">
         <div
-          v-for="transaction in rechargeTransactions"
+          v-for="transaction in rechargeAndRefundTransactions"
           :key="transaction.id"
           class="transaction-card"
           :class="transaction.status.toLowerCase()"

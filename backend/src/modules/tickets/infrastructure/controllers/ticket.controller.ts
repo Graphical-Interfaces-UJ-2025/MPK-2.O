@@ -6,6 +6,7 @@ import { CreateTicketUseCase } from '../../application/use-cases/create-ticket.u
 import { DeleteTicketUseCase } from '../../application/use-cases/delete-ticket.use-case';
 import { GetUserTicketOrdersHistoryUseCase } from '../../application/use-cases/get-user-ticket-orders-history.use-case';
 import { PurchaseTicketUseCase } from '../../application/use-cases/purchase-ticket.use-case';
+import { ReturnTicketOrderUseCase } from '../../application/use-cases/return-ticket-order.use-case';
 import { CreateTicketDto } from '../../application/dto/create-ticket.dto';
 import { RequestWithUser } from '../../../shared/infrastructure/middlewares';
 import { Pagination } from '../../../shared/application/query/pagination.query';
@@ -20,7 +21,8 @@ export class TicketController {
     @inject(DeleteTicketUseCase) private deleteTicketUseCase: DeleteTicketUseCase,
     @inject(GetUserTicketOrdersHistoryUseCase)
     private getUserTicketOrdersHistoryUseCase: GetUserTicketOrdersHistoryUseCase,
-    @inject(PurchaseTicketUseCase) private purchaseTicketUseCase: PurchaseTicketUseCase
+    @inject(PurchaseTicketUseCase) private purchaseTicketUseCase: PurchaseTicketUseCase,
+    @inject(ReturnTicketOrderUseCase) private returnTicketOrderUseCase: ReturnTicketOrderUseCase
   ) {}
 
   /**
@@ -271,7 +273,7 @@ export class TicketController {
    * /api/tickets/orders-history/{id}:
    *   get:
    *     summary: Get order history for current user
-   *     description: Returns paginated ticket order history for the authenticated user. Only accessible by users with 'user' role.
+   *     description: Returns paginated ticket order history for the authenticated user with refund information. Only accessible by users with 'user' role.
    *     tags: [Tickets]
    *     security:
    *       - bearerAuth: []
@@ -294,7 +296,60 @@ export class TicketController {
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/TicketOrdersHistoryResponse'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       id:
+   *                         type: string
+   *                         format: uuid
+   *                       ticketId:
+   *                         type: string
+   *                         format: uuid
+   *                       ticketName:
+   *                         type: string
+   *                       validFrom:
+   *                         type: string
+   *                         format: date-time
+   *                       validTo:
+   *                         type: string
+   *                         format: date-time
+   *                       orderedAt:
+   *                         type: string
+   *                         format: date-time
+   *                       price:
+   *                         type: integer
+   *                         description: Price in grosze
+   *                       isRefundable:
+   *                         type: boolean
+   *                         description: Whether the ticket can be refunded (less than 10% elapsed)
+   *                       refundablePrice:
+   *                         type: integer
+   *                         description: Amount that can be refunded in grosze
+   *                       elapsedPercentage:
+   *                         type: number
+   *                         description: Percentage of validity period that has elapsed
+   *                       isRefunded:
+   *                         type: boolean
+   *                         description: Whether the ticket has been refunded
+   *                 pagination:
+   *                   type: object
+   *                   properties:
+   *                     total:
+   *                       type: integer
+   *                     page:
+   *                       type: integer
+   *                     pageSize:
+   *                       type: integer
+   *                     hasNext:
+   *                       type: boolean
+   *                     hasPrev:
+   *                       type: boolean
    *       401:
    *         description: Unauthorized
    *         content:
@@ -320,12 +375,17 @@ export class TicketController {
       res.status(200).json({
         success: true,
         data: result.data.map((o) => ({
+          id: o.id,
           ticketId: o.ticketId,
           ticketName: o.ticketName,
           validFrom: o.validFrom,
           validTo: o.validTo,
           orderedAt: o.orderedAt,
           price: o.price,
+          isRefundable: o.isRefundable,
+          refundablePrice: o.refundablePrice,
+          elapsedPercentage: o.elapsedPercentage,
+          isRefunded: o.isRefunded,
         })),
         pagination: {
           total: result.total,
@@ -406,16 +466,20 @@ export class TicketController {
 
       const pagination = new Pagination(limit, offset);
       const result = await this.getUserTicketOrdersHistoryUseCase.execute(userId, pagination);
-
       res.status(200).json({
         success: true,
         data: result.data.map((o) => ({
+          id: o.id,
           ticketId: o.ticketId,
           ticketName: o.ticketName,
           validFrom: o.validFrom,
           validTo: o.validTo,
           orderedAt: o.orderedAt,
           price: o.price,
+          isRefundable: o.isRefundable,
+          refundablePrice: o.refundablePrice,
+          elapsedPercentage: o.elapsedPercentage,
+          isRefunded: o.isRefunded,
         })),
         pagination: {
           total: result.total,
@@ -478,13 +542,12 @@ export class TicketController {
   async purchase(req: Request, res: Response): Promise<void> {
     try {
       const { id: userId } = (req as RequestWithUser).user;
-      const { ticketId, validFrom, validTo } = req.body;
+      const { ticketId, validFrom } = req.body;
 
       const order = await this.purchaseTicketUseCase.execute({
         userId,
         ticketId,
         validFrom: new Date(validFrom),
-        validTo: new Date(validTo),
       });
 
       res.status(201).json({
@@ -506,6 +569,92 @@ export class TicketController {
         status = 401;
       } else if (message === TICKET_ERRORS.TICKET_NOT_FOUND) {
         status = 404;
+      }
+
+      res.status(status).json({
+        success: false,
+        message,
+      });
+    }
+  }
+
+  /**
+   * @swagger
+   * /api/tickets/return/{ticketOrderId}:
+   *   post:
+   *     summary: Return a purchased ticket and get a refund
+   *     description: Returns a ticket order if less than 10% of its validity period has elapsed. Refund amount is calculated based on the remaining validity period.
+   *     tags: [Tickets]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: ticketOrderId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: The ID of the ticket order to return
+   *     responses:
+   *       200:
+   *         description: Ticket return initiated successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: Ticket return initiated successfully
+   *       400:
+   *         description: Bad request (ticket not refundable, more than 10% elapsed)
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       401:
+   *         description: Unauthorized
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   *       404:
+   *         description: Ticket order not found or doesn't belong to user
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ErrorResponse'
+   */
+  async returnTicket(req: Request, res: Response): Promise<void> {
+    try {
+      const { id: userId } = (req as RequestWithUser).user;
+      const { ticketOrderId } = req.params;
+
+      await this.returnTicketOrderUseCase.execute({
+        userId,
+        ticketOrderId,
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Ticket return initiated successfully',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      let status = 400;
+
+      if (message === TICKET_ERRORS.USER_NOT_FOUND) {
+        status = 401;
+      } else if (
+        message === TICKET_ERRORS.TICKET_ORDER_NOT_FOUND ||
+        message.includes('does not belong to user')
+      ) {
+        status = 404;
+      } else if (message === TICKET_ERRORS.TICKET_NOT_REFUNDABLE) {
+        status = 400;
       }
 
       res.status(status).json({

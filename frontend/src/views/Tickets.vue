@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useTicketsStore } from '@/stores/tickets';
 import { useAuthStore } from '@/stores/auth';
 import TicketCard from '@/components/TicketCard.vue';
@@ -18,6 +18,92 @@ const handleSelectTicket = (ticketId) => {
 const handlePurchase = async () => {
   await ticketsStore.purchaseTicket();
 };
+
+const formatDuration = (validTime) => {
+  if (!validTime) return '';
+
+  const unitLabels = {
+    minutes: validTime.value === 1 ? 'minuta' : validTime.value < 5 ? 'minuty' : 'minut',
+    days: validTime.value === 1 ? 'dzień' : 'dni',
+    months: validTime.value === 1 ? 'miesiąc' : validTime.value < 5 ? 'miesiące' : 'miesięcy',
+  };
+
+  return `${validTime.value} ${unitLabels[validTime.unit]}`;
+};
+
+const calculateExpirationDate = computed(() => {
+  if (!ticketsStore.selectedTicket?.validTime || !ticketsStore.purchaseForm.validFrom) {
+    return null;
+  }
+
+  const startDate = new Date(ticketsStore.purchaseForm.validFrom);
+  const { value, unit } = ticketsStore.selectedTicket.validTime;
+
+  const expirationDate = new Date(startDate);
+
+  switch (unit) {
+    case 'minutes':
+      expirationDate.setMinutes(expirationDate.getMinutes() + value);
+      break;
+    case 'days':
+      expirationDate.setDate(expirationDate.getDate() + value);
+      break;
+    case 'months':
+      expirationDate.setMonth(expirationDate.getMonth() + value);
+      break;
+  }
+
+  return expirationDate;
+});
+
+const formattedExpirationDate = computed(() => {
+  if (!calculateExpirationDate.value) return '';
+
+  const date = calculateExpirationDate.value;
+  const validTime = ticketsStore.selectedTicket?.validTime;
+
+  // For minutes-based tickets, show date and time
+  if (validTime?.unit === 'minutes') {
+    return date.toLocaleString('pl-PL', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  // For day/month-based tickets, show just the date
+  return date.toLocaleDateString('pl-PL', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+});
+
+const handleDateChange = (event) => {
+  const isoDate = event.target.value; // Native date input returns YYYY-MM-DD format
+  ticketsStore.updatePurchaseForm('validFrom', isoDate);
+};
+
+const minDateISO = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+});
+
+const isValidDate = computed(() => {
+  if (!ticketsStore.purchaseForm.validFrom) return true; // Empty is valid (not yet filled)
+
+  const selectedDate = new Date(ticketsStore.purchaseForm.validFrom);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return !isNaN(selectedDate.getTime()) && selectedDate >= today;
+});
 </script>
 
 <template>
@@ -77,6 +163,10 @@ const handlePurchase = async () => {
               <span>Cena:</span>
               <strong>{{ ticketsStore.formattedTicketPrice }}</strong>
             </div>
+            <div v-if="ticketsStore.selectedTicket.validTime" class="summary-row">
+              <span>Czas ważności:</span>
+              <strong>{{ formatDuration(ticketsStore.selectedTicket.validTime) }}</strong>
+            </div>
           </div>
 
           <!-- Valid From Date -->
@@ -85,18 +175,29 @@ const handlePurchase = async () => {
               <i class="fa-solid fa-calendar"></i>
               Ważny od
             </label>
-            <input
-              type="date"
-              :value="ticketsStore.purchaseForm.validFrom"
-              @input="ticketsStore.updatePurchaseForm('validFrom', $event.target.value)"
-            />
+            <div class="date-input-wrapper">
+              <input
+                type="date"
+                :value="ticketsStore.purchaseForm.validFrom"
+                @change="handleDateChange"
+                :min="minDateISO"
+                :class="{ 'invalid': !isValidDate }"
+              />
+            </div>
+            <div v-if="!isValidDate && ticketsStore.purchaseForm.validFrom" class="validation-error">
+              <i class="fa-solid fa-exclamation-circle"></i>
+              <span>Data nie może być z przeszłości</span>
+            </div>
           </div>
 
-          <!-- Monthly Ticket Info -->
-          <!-- <div class="ticket-info">
-            <i class="fa-solid fa-info-circle"></i>
-            <span>Bilet miesięczny ważny przez 30 dni od daty rozpoczęcia</span>
-          </div> -->
+          <!-- Expiration Date Info -->
+          <div v-if="formattedExpirationDate" class="expiration-info">
+            <i class="fa-solid fa-calendar-check"></i>
+            <div class="expiration-content">
+              <span class="expiration-label">Bilet wygaśnie:</span>
+              <strong class="expiration-date">{{ formattedExpirationDate }}</strong>
+            </div>
+          </div>
 
           <!-- Balance Warning -->
           <div v-if="!ticketsStore.checkSufficientBalance(ticketsStore.selectedTicket.price)" class="warning-message">
@@ -283,6 +384,71 @@ const handlePurchase = async () => {
   font-size: 16px;
 }
 
+.date-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.date-input-wrapper input[type='date'] {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  background: var(--background-primary);
+  color: var(--text-main);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.date-input-wrapper input[type='date']:hover {
+  border-color: var(--background-main);
+}
+
+.date-input-wrapper input[type='date']:focus {
+  outline: none;
+  border-color: var(--background-main);
+  box-shadow: 0 0 0 3px rgba(0, 31, 63, 0.15);
+}
+
+.date-input-wrapper input[type='date'].invalid {
+  border-color: #dc3545;
+}
+
+.date-input-wrapper input[type='date'].invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+}
+
+/* Style the calendar icon in date picker */
+.date-input-wrapper input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: opacity(0.7);
+  transition: filter 0.2s ease;
+}
+
+.date-input-wrapper input[type='date']::-webkit-calendar-picker-indicator:hover {
+  filter: opacity(1);
+}
+
+.validation-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #dc3545;
+}
+
+.validation-error i {
+  font-size: 14px;
+}
+
 .form-group input[type='date'] {
   width: 100%;
   padding: 14px 16px;
@@ -320,6 +486,41 @@ const handlePurchase = async () => {
 
 .ticket-info i {
   font-size: 18px;
+}
+
+.expiration-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(0, 31, 63, 0.08) 0%, rgba(0, 31, 63, 0.04) 100%);
+  border: 1px solid rgba(0, 31, 63, 0.15);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.expiration-info i {
+  font-size: 20px;
+  color: var(--background-main);
+  flex-shrink: 0;
+}
+
+.expiration-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.expiration-label {
+  font-size: 12px;
+  color: var(--text-additional);
+  font-weight: 500;
+}
+
+.expiration-date {
+  font-size: 16px;
+  color: var(--background-main);
+  font-weight: 700;
 }
 
 .warning-message,

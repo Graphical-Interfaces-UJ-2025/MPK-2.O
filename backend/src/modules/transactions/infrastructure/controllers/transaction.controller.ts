@@ -81,7 +81,35 @@ export class TransactionController {
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/TransactionHistoryResponse'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       id:
+   *                         type: string
+   *                         format: uuid
+   *                       type:
+   *                         type: string
+   *                         enum: [RECHARGE, TICKET_PURCHASE, TICKET_REFUND]
+   *                       amount:
+   *                         type: integer
+   *                         description: Amount in grosze
+   *                       ticketId:
+   *                         type: string
+   *                         format: uuid
+   *                         nullable: true
+   *                       status:
+   *                         type: string
+   *                         enum: [PENDING, COMPLETED, FAILED]
+   *                       createdAt:
+   *                         type: string
+   *                         format: date-time
    *       401:
    *         description: Unauthorized
    *         content:

@@ -11,6 +11,24 @@ import { db } from '../../../../config/database.config';
 
 @injectable()
 export class TicketOrderRepository implements ITicketOrderRepository {
+  async findById(id: string): Promise<TicketOrder | null> {
+    const result = await db
+      .select({
+        order: ticketOrder,
+        ticketName: ticket.name,
+      })
+      .from(ticketOrder)
+      .leftJoin(ticket, eq(ticketOrder.ticketId, ticket.id))
+      .where(eq(ticketOrder.id, id))
+      .limit(1);
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    return TicketOrderMapper.toDomain(result[0].order, result[0].ticketName ?? undefined);
+  }
+
   async findByUserId(userId: string): Promise<TicketOrder[]> {
     const result = await db
       .select({
@@ -56,5 +74,19 @@ export class TicketOrderRepository implements ITicketOrderRepository {
     const record = TicketOrderMapper.toPersistence(order);
     const [created] = await db.insert(ticketOrder).values(record).returning();
     return TicketOrderMapper.toDomain(created, order.ticketName);
+  }
+
+  async update(order: TicketOrder): Promise<TicketOrder> {
+    const record = TicketOrderMapper.toPersistence(order);
+    const [updated] = await db
+      .update(ticketOrder)
+      .set(record)
+      .where(eq(ticketOrder.id, order.id))
+      .returning();
+    return TicketOrderMapper.toDomain(updated, order.ticketName);
+  }
+
+  async delete(id: string): Promise<void> {
+    await db.delete(ticketOrder).where(eq(ticketOrder.id, id));
   }
 }

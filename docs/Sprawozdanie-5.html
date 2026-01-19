@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Sprawozdanie #5 - MPK 2.0</title>
+    <style>
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20mm;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24pt;
+            margin-bottom: 5px;
+        }
+        .authors {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .report-number {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 14pt;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        h3 {
+            font-size: 12pt;
+            margin-top: 20px;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        blockquote {
+            margin: 10px 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-left: 3px solid #ccc;
+            font-style: italic;
+        }
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .footer {
+            text-align: center;
+            font-style: italic;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+        }
+        .priority-high { color: #c00; }
+        .priority-medium { color: #c90; }
+        .priority-low { color: #090; }
+    </style>
+</head>
+<body>
+
+<h1>MPK 2.O</h1>
+<p class="authors"><strong>Yaroslav Kobryn, Maksymilian Pająk, Yevhen Kotliarchuk</strong></p>
+<p class="report-number">Sprawozdanie #5</p>
+
+<hr>
+
+<h2>Instrukcja dla testerów</h2>
+
+<h3>Konto testowe</h3>
+<p>Do testowania aplikacji można użyć następującego konta:</p>
+<table>
+    <tr>
+        <th>Pole</th>
+        <th>Wartość</th>
+    </tr>
+    <tr>
+        <td>Email</td>
+        <td><strong>jan.kowalski@example.com</strong></td>
+    </tr>
+    <tr>
+        <td>Hasło</td>
+        <td><strong>12345678</strong></td>
+    </tr>
+</table>
+
+<h3>Informacje wstępne</h3>
+<p>Aplikacja MPK 2.0 to system zarządzania komunikacją miejską, który umożliwia:</p>
+<ul>
+    <li>Przeglądanie linii tramwajowych i autobusowych</li>
+    <li>Przeglądanie przystanków</li>
+    <li>Planowanie podróży</li>
+    <li>Zakup biletów (po zalogowaniu)</li>
+    <li>Doładowanie konta (po zalogowaniu)</li>
+    <li>Przeglądanie historii zamówień i doładowań (po zalogowaniu)</li>
+</ul>
+
+<h2>Scenariusze testowe</h2>
+
+<h3>Scenariusz 1: Rejestracja nowego użytkownika</h3>
+<p><strong>Cel:</strong> Sprawdzenie procesu tworzenia nowego konta w systemie.</p>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Otwórz stronę główną aplikacji</li>
+    <li>Kliknij przycisk "Zaloguj się" w prawym górnym rogu</li>
+    <li>Na stronie logowania kliknij link "Zarejestruj się"</li>
+    <li>Wypełnij formularz rejestracji:
+        <ul>
+            <li>Imię</li>
+            <li>Nazwisko</li>
+            <li>Email</li>
+            <li>PESEL (11 cyfr)</li>
+            <li>Hasło (minimum 6 znaków)</li>
+        </ul>
+    </li>
+    <li>Kliknij przycisk "Zarejestruj się"</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Użytkownik zostaje zarejestrowany i automatycznie zalogowany</li>
+    <li>Przekierowanie do strony z biletami</li>
+    <li>W prawym górnym rogu widoczne imię i nazwisko użytkownika</li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 2: Logowanie do systemu</h3>
+<p><strong>Cel:</strong> Sprawdzenie procesu logowania istniejącego użytkownika.</p>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Otwórz stronę główną aplikacji</li>
+    <li>Kliknij przycisk "Zaloguj się" w prawym górnym rogu</li>
+    <li>Wprowadź email i hasło</li>
+    <li>Kliknij przycisk "Zaloguj się"</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Użytkownik zostaje zalogowany</li>
+    <li>W prawym górnym rogu widoczne imię i nazwisko użytkownika oraz saldo konta</li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 3: Przeglądanie linii komunikacyjnych</h3>
+<p><strong>Cel:</strong> Sprawdzenie funkcjonalności przeglądania dostępnych linii.</p>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Kliknij "LINIE" w menu nawigacyjnym</li>
+    <li>Przejrzyj listę dostępnych tramwajów i autobusów</li>
+    <li>Użyj pola wyszukiwania, aby znaleźć konkretną linię</li>
+    <li>Kliknij na wybraną linię, aby zobaczyć szczegóły</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Wyświetlenie listy linii tramwajowych i autobusowych</li>
+    <li>Filtrowanie działa poprawnie</li>
+    <li>Po kliknięciu na linię wyświetlają się szczegóły trasy</li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 4: Przeglądanie przystanków</h3>
+<p><strong>Cel:</strong> Sprawdzenie funkcjonalności przeglądania przystanków.</p>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Kliknij "PRZYSTANKI" w menu nawigacyjnym</li>
+    <li>Przejrzyj listę dostępnych przystanków</li>
+    <li>Użyj pola wyszukiwania, aby znaleźć konkretny przystanek</li>
+    <li>Kliknij "Rozkład jazdy" przy wybranym przystanku</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Wyświetlenie listy wszystkich przystanków</li>
+    <li>Widoczne są linie obsługujące każdy przystanek</li>
+    <li>Wyszukiwanie działa poprawnie</li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 5: Planowanie podróży</h3>
+<p><strong>Cel:</strong> Sprawdzenie funkcjonalności planera podróży.</p>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Kliknij "PLANER PODRÓŻY" w menu nawigacyjnym</li>
+    <li>Wybierz przystanek początkowy z listy "Skąd"</li>
+    <li>Wybierz przystanek docelowy z listy "Dokąd"</li>
+    <li>Ustaw godzinę odjazdu</li>
+    <li>Kliknij "Szukaj połączenia"</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Wyświetlenie listy dostępnych połączeń</li>
+    <li>Dla każdego połączenia widoczny czas podróży i liczba przesiadek</li>
+    <li>Możliwość wyboru trasy</li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 6: Zakup biletu</h3>
+<p><strong>Cel:</strong> Sprawdzenie procesu zakupu biletu (wymaga zalogowania).</p>
+<p><strong>Dostępne rodzaje biletów:</strong></p>
+<ul>
+    <li><strong>Bilet dobowy 24-godzinny</strong> - ważny 1 dzień (nie podlega zwrotowi)</li>
+    <li><strong>Bilet 7-dniowy</strong> - ważny 7 dni (podlega zwrotowi)</li>
+    <li><strong>Bilet miesięczny</strong> - ważny 30 dni (podlega zwrotowi)</li>
+</ul>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Zaloguj się do systemu</li>
+    <li>Kliknij "BILETY" w menu nawigacyjnym</li>
+    <li>Przejrzyj dostępne bilety wyświetlone w siatce kart</li>
+    <li>Kliknij "Wybierz" na wybranym bilecie - karta zostanie podświetlona</li>
+    <li>W sekcji "Szczegóły zakupu" ustaw datę rozpoczęcia ważności biletu (pole "Ważny od")</li>
+    <li>System automatycznie wyświetli datę wygaśnięcia biletu</li>
+    <li>Sprawdź podsumowanie: nazwa biletu, cena, czas ważności</li>
+    <li>Kliknij "Kup bilet"</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Bilet zostaje zakupiony</li>
+    <li>Pojawia się powiadomienie o pomyślnym zakupie</li>
+    <li>Saldo konta (widoczne w prawym górnym rogu) zostaje pomniejszone o cenę biletu</li>
+    <li>Następuje automatyczne przekierowanie do historii zamówień</li>
+    <li>Bilet pojawia się na liście z odpowiednim statusem ("Aktywny" lub oczekuje na datę rozpoczęcia)</li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 7: Doładowanie konta</h3>
+<p><strong>Cel:</strong> Sprawdzenie procesu doładowania salda konta (wymaga zalogowania).</p>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Zaloguj się do systemu</li>
+    <li>Kliknij na swoje imię w prawym górnym rogu</li>
+    <li>Wybierz "Doładuj konto" z menu</li>
+    <li>Wybierz kwotę doładowania (50, 100, 200 lub 500 PLN) lub wpisz własną</li>
+    <li>Kliknij "Doładuj konto"</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Saldo konta zostaje zwiększone o wybraną kwotę</li>
+    <li>Transakcja pojawia się w historii doładowań</li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 8: Przeglądanie profilu i historii</h3>
+<p><strong>Cel:</strong> Sprawdzenie dostępu do danych użytkownika (wymaga zalogowania).</p>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Zaloguj się do systemu</li>
+    <li>Kliknij na swoje imię w prawym górnym rogu</li>
+    <li>Wybierz "Profil" (<code>/profile</code>) - sprawdź dane osobowe</li>
+    <li>Wybierz "Historia zamówień" (<code>/orders</code>) - sprawdź zakupione bilety</li>
+    <li>Wybierz "Historia doładowań" (<code>/recharge-history</code>) - sprawdź doładowania i zwroty</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Profil wyświetla: imię, nazwisko, PESEL (zamaskowany - widoczne tylko środkowe 5 cyfr), aktualne saldo</li>
+    <li>Historia zamówień pokazuje zakupione bilety ze statusem:
+        <ul>
+            <li><strong>Aktywny</strong> (zielony) - bilet w okresie ważności</li>
+            <li><strong>Wygasły</strong> (szary) - bilet po okresie ważności</li>
+            <li><strong>Zwrócony</strong> (czerwony) - bilet został zwrócony</li>
+        </ul>
+    </li>
+    <li>Historia doładowań pokazuje transakcje typu:
+        <ul>
+            <li><strong>Doładowanie</strong> - dodanie środków na konto</li>
+            <li><strong>Zwrot biletu</strong> - zwrot środków za bilet</li>
+        </ul>
+    </li>
+</ul>
+
+<hr>
+
+<h3>Scenariusz 9: Zwrot biletu</h3>
+<p><strong>Cel:</strong> Sprawdzenie procesu zwrotu biletu (wymaga zalogowania).</p>
+<p><strong>Warunki wstępne:</strong></p>
+<ul>
+    <li>Użytkownik musi być zalogowany</li>
+    <li>Użytkownik musi mieć wystarczające saldo na koncie do zakupu biletów</li>
+</ul>
+<p><strong>Ważne informacje o zwrotach:</strong></p>
+<ul>
+    <li>Tylko bilety z ważnością <strong>7 dni lub dłużej</strong> podlegają zwrotowi</li>
+    <li>Zwrot możliwy tylko jeśli upłynęło mniej niż 10% okresu ważności biletu</li>
+    <li>Kwota zwrotu zależy od pozostałego czasu ważności biletu</li>
+</ul>
+<p><strong>Kroki do wykonania:</strong></p>
+<ol>
+    <li>Zaloguj się do systemu</li>
+    <li>Kliknij "BILETY" w menu nawigacyjnym (strona <code>/tickets</code>)</li>
+    <li>Wybierz bilet <strong>"Bilet dobowy 24-godzinny"</strong> (bilet 1-dniowy)</li>
+    <li>Ustaw datę rozpoczęcia ważności i kliknij "Kup bilet"</li>
+    <li>Po zakupie zostaniesz przekierowany do strony <code>/orders</code> (Historia zamówień)</li>
+    <li>Znajdź zakupiony bilet dobowy - zauważ, że <strong>NIE MA opcji zwrotu</strong> (bilet krótszy niż 7 dni)</li>
+    <li>Wróć do strony <code>/tickets</code> i kup bilet z ważnością <strong>7 dni lub dłużej</strong> (np. "Bilet 7-dniowy" lub "Bilet miesięczny")</li>
+    <li>Przejdź do <code>/orders</code> - znajdź nowo zakupiony bilet</li>
+    <li>Zauważ sekcję <strong>"Możliwy zwrot"</strong> z:
+        <ul>
+            <li>Kwotą zwrotu w PLN</li>
+            <li>Procentem wykorzystania biletu</li>
+        </ul>
+    </li>
+    <li>Kliknij przycisk <strong>"Zwróć bilet"</strong></li>
+    <li>Potwierdź zwrot w oknie dialogowym</li>
+    <li>Przejdź do strony <code>/recharge-history</code> (Historia doładowań i zwrotów)</li>
+    <li>Znajdź transakcję typu <strong>"Zwrot biletu"</strong> z odpowiednią kwotą</li>
+</ol>
+<p><strong>Oczekiwany rezultat:</strong></p>
+<ul>
+    <li>Bilet 1-dniowy (24-godzinny) <strong>nie ma</strong> opcji zwrotu</li>
+    <li>Bilet 7-dniowy lub dłuższy <strong>ma</strong> opcję zwrotu z widoczną kwotą</li>
+    <li>Po kliknięciu "Zwróć bilet" pojawia się okno potwierdzenia</li>
+    <li>Po potwierdzeniu zwrotu:
+        <ul>
+            <li>Pojawia się powiadomienie o pomyślnym zwrocie</li>
+            <li>Status biletu zmienia się na <strong>"Zwrócony"</strong> (czerwona etykieta)</li>
+            <li>Kwota zwrotu zostaje dodana do salda konta</li>
+        </ul>
+    </li>
+    <li>W historii doładowań (<code>/recharge-history</code>) widoczna jest transakcja "Zwrot biletu" z dodatnią kwotą</li>
+</ul>
+
+<hr>
+
+<p><strong>Uwagi i sugestie:</strong></p>
+<ol>
+    <li><strong>Strona zakupu biletów - szybki dostęp do historii</strong>
+        <blockquote>"Dodajcie szybki link do historii zamówień lub jeszcze lepiej, pokażcie ostatnie 3-5 kupionych biletów bezpośrednio na tej stronie. Często kupuję ten sam rodzaj biletu i chcę szybko zweryfikować poprzednie zakupy bez opuszczania strony."</blockquote>
+    </li>
+    <li><strong>Planer podróży - potrzeba autouzupełniania i przycisku zamiany</strong>
+        <blockquote>"Wybór przystanku MUSI być rozwijaną listą z wyszukiwaniem i autouzupełnianiem! Przy dziesiątkach przystanków używanie zwykłej listy rozwijanej jest frustrujące. Dodajcie też przycisk 'zamień' między miejscem początkowym a docelowym dla podróży powrotnych."</blockquote>
+    </li>
+    <li><strong>Historia doładowań - więcej szczegółów</strong>
+        <blockquote>"Strona doładowań powinna wyświetlać historię transakcji pod formularzem. Pokażcie przynajmniej ostatnie 5-10 doładowań z: datą, kwotą, metodą płatności i statusem. To buduje zaufanie i pomaga użytkownikom śledzić wydatki."</blockquote>
+    </li>
+    <li><strong>Ogólne sugestie UX</strong>
+        <blockquote>"Rozważcie dodanie skrótów klawiszowych dla zaawansowanych użytkowników i może funkcję 'ulubione przystanki' w planerze podróży."</blockquote>
+    </li>
+</ol>
+
+<hr>
+
+<p class="footer"><em>Sprawozdanie #5 - MPK 2.0</em></p>
+
+</body>
+</html>
