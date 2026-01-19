@@ -1,5 +1,6 @@
 export const TRANSACTION_EVENTS = {
   RECHARGE_INITIATED: 'transaction.recharge.initiated',
+  REFUND_INITIATED: 'transaction.refund.initiated',
 } as const;
 
 export const TRANSACTION_ERRORS = {

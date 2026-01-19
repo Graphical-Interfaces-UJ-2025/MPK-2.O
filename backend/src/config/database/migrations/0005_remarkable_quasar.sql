@@ -1,0 +1,1 @@
+ALTER TABLE "ticket_order" ADD COLUMN "is_refunded" boolean DEFAULT false NOT NULL;

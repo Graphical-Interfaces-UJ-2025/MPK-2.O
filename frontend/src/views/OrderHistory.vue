@@ -5,6 +5,7 @@ import { addNotification } from '@/stores/notifications';
 
 const orders = ref([]);
 const isLoading = ref(true);
+const refundingTickets = ref(new Set());
 const pagination = ref({
   total: 0,
   page: 1,
@@ -46,6 +47,32 @@ const fetchOrders = async () => {
     orders.value = [];
   } finally {
     isLoading.value = false;
+  }
+};
+
+const handleRefund = async (order) => {
+  if (!order.isRefundable) return;
+
+  const confirmMessage = `Czy na pewno chcesz zwrócić bilet "${order.ticketName}"?\n\nZwrot: ${formatPrice(order.refundablePrice)}`;
+
+  if (!confirm(confirmMessage)) {
+    return;
+  }
+
+  refundingTickets.value.add(order.id);
+
+  try {
+    await apiClient.tickets.postApiTicketsReturn({ ticketOrderId: order.id })
+    addNotification('Zwrot biletu został zainicjowany pomyślnie', 'success');
+
+    // Refresh the orders list to reflect the change
+    await fetchOrders();
+  } catch (err) {
+    console.error('Error refunding ticket:', err);
+    const errorMessage = err.response?.data?.message || 'Nie udało się zwrócić biletu';
+    addNotification(errorMessage, 'error');
+  } finally {
+    refundingTickets.value.delete(order.id);
   }
 };
 
@@ -104,8 +131,15 @@ onMounted(() => {
         >
           <div class="order-header">
             <span class="ticket-name">{{ order.ticketName || 'Bilet' }}</span>
-            <span class="status-badge" :class="isActive(order) ? 'active' : 'expired'">
-              {{ isActive(order) ? 'Aktywny' : 'Wygasły' }}
+            <span
+              class="status-badge"
+              :class="{
+                refunded: order.isRefunded,
+                active: !order.isRefunded && isActive(order),
+                expired: !order.isRefunded && !isActive(order),
+              }"
+            >
+              {{ order.isRefunded ? 'Zwrócony' : isActive(order) ? 'Aktywny' : 'Wygasły' }}
             </span>
           </div>
 
@@ -140,6 +174,30 @@ onMounted(() => {
                 Cena
               </span>
               <span class="value price">{{ formatPrice(order.price) }}</span>
+            </div>
+
+            <div v-if="order.isRefundable" class="refund-section">
+              <div class="refund-info">
+                <i class="fa-solid fa-info-circle"></i>
+                <div class="refund-details">
+                  <span class="refund-label">Możliwy zwrot</span>
+                  <span class="refund-amount">{{ formatPrice(order.refundablePrice) }}</span>
+                  <span class="refund-percent"
+                    >({{ order.elapsedPercentage?.toFixed(1) || 0 }}% wykorzystane)</span
+                  >
+                </div>
+              </div>
+              <button
+                @click="handleRefund(order)"
+                :disabled="refundingTickets.has(order.id)"
+                class="refund-button"
+              >
+                <i
+                  class="fa-solid"
+                  :class="refundingTickets.has(order.id) ? 'fa-spinner fa-spin' : 'fa-rotate-left'"
+                ></i>
+                {{ refundingTickets.has(order.id) ? 'Zwracanie...' : 'Zwróć bilet' }}
+              </button>
             </div>
           </div>
         </div>
@@ -276,6 +334,11 @@ onMounted(() => {
   color: #9ca3af;
 }
 
+.status-badge.refunded {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
 .order-details {
   display: flex;
   flex-direction: column;
@@ -380,6 +443,87 @@ onMounted(() => {
 .action-button.primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 31, 63, 0.4);
+}
+
+.refund-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.refund-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #22c55e;
+}
+
+.refund-info i {
+  color: #22c55e;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.refund-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.refund-label {
+  font-size: 13px;
+  color: var(--text-additional);
+  font-weight: 500;
+}
+
+.refund-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.refund-percent {
+  font-size: 12px;
+  color: var(--text-additional);
+}
+
+.refund-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 2px solid #ef4444;
+  border-radius: 8px;
+  background: transparent;
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.refund-button:hover:not(:disabled) {
+  background: #ef4444;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.refund-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refund-button i {
+  font-size: 14px;
 }
 
 @media (max-width: 480px) {

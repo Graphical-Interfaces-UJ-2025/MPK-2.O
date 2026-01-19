@@ -4,6 +4,7 @@ import {
   IQueueServiceToken,
 } from '../../../shared/application/services/queue.interface';
 import { ProceedBalanceRechargeUseCase } from '../../application/use-cases/proceed-balance-recharge.use-case';
+import { ProceedTicketRefundUseCase } from '../../application/use-cases/proceed-ticket-refund.use-case';
 import { TRANSACTION_EVENTS } from '../../constants';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
 
@@ -11,6 +12,7 @@ export const registerTransactionsQueueListener = () => {
   const logger = container.resolve<ILogger>(ILoggerToken).child('TransactionsQueueListener');
   const queueService: IQueueService = container.resolve(IQueueServiceToken);
   const proceedBalanceRechargeUseCase = container.resolve(ProceedBalanceRechargeUseCase);
+  const proceedTicketRefundUseCase = container.resolve(ProceedTicketRefundUseCase);
 
   queueService.on<{ transactionId: string }>(
     TRANSACTION_EVENTS.RECHARGE_INITIATED,
@@ -36,7 +38,33 @@ export const registerTransactionsQueueListener = () => {
     }
   );
 
+  queueService.on<{ transactionId: string; ticketOrderId: string }>(
+    TRANSACTION_EVENTS.REFUND_INITIATED,
+    async (event) => {
+      const { transactionId, ticketOrderId } = event.payload;
+
+      logger.info('Processing refund initiated event', {
+        transactionId,
+        ticketOrderId,
+        eventName: event.name,
+        timestamp: event.timestamp,
+      });
+
+      try {
+        await proceedTicketRefundUseCase.execute({ transactionId, ticketOrderId });
+
+        logger.info('Refund processed successfully', { transactionId, ticketOrderId });
+      } catch (error) {
+        logger.error('Failed to process refund', {
+          transactionId,
+          ticketOrderId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  );
+
   logger.info('Transaction queue listeners registered', {
-    events: [TRANSACTION_EVENTS.RECHARGE_INITIATED],
+    events: [TRANSACTION_EVENTS.RECHARGE_INITIATED, TRANSACTION_EVENTS.REFUND_INITIATED],
   });
 };

@@ -1,4 +1,5 @@
 import { inject, injectable } from 'tsyringe';
+import { v4 as uuidv4 } from 'uuid';
 import {
   IUserRepository,
   IUserRepositoryToken,
@@ -13,13 +14,34 @@ import {
 } from '../repositories/ticket-order.repository.interface';
 import { ILogger, ILoggerToken } from '../../../shared/application/services/logger.interface';
 import { TicketOrder } from '../../domain/entities/ticket-order.entity';
+import { ValidTime } from '../../domain/entities/ticket.entity';
 import { TICKET_ERRORS } from '../../constants';
 
 export interface PurchaseTicketInput {
   userId: string;
   ticketId: string;
   validFrom: Date;
-  validTo: Date;
+}
+
+/**
+ * Calculates the validTo date based on validFrom and ticket's validTime
+ */
+function calculateValidTo(validFrom: Date, validTime: ValidTime): Date {
+  const validTo = new Date(validFrom);
+
+  switch (validTime.unit) {
+    case 'minutes':
+      validTo.setMinutes(validTo.getMinutes() + validTime.value);
+      break;
+    case 'days':
+      validTo.setDate(validTo.getDate() + validTime.value);
+      break;
+    case 'months':
+      validTo.setMonth(validTo.getMonth() + validTime.value);
+      break;
+  }
+
+  return validTo;
 }
 
 @injectable()
@@ -56,7 +78,6 @@ export class PurchaseTicketUseCase {
 
     const price = ticket.currentPrice ?? 0;
 
-    console.log(user.balance, price);
     if (user.balance < price) {
       this.logger.warn('Purchase failed: Insufficient balance', {
         userId: input.userId,
@@ -69,13 +90,18 @@ export class PurchaseTicketUseCase {
     const updatedUser = user.deductBalance(price);
     await this.userRepository.update(updatedUser);
 
+    // Calculate validTo based on ticket's validTime
+    const validTo = calculateValidTo(input.validFrom, ticket.validTime);
+
     const ticketOrder = new TicketOrder(
+      uuidv4(),
       input.userId,
       input.ticketId,
       input.validFrom,
-      input.validTo,
+      validTo,
       new Date(),
       price,
+      false,
       ticket.name
     );
 

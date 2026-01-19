@@ -185,12 +185,18 @@ const options: swaggerJsdoc.Options = {
         },
         PurchaseTicketRequest: {
           type: 'object',
-          required: ['ticketId', 'validFrom', 'validTo', 'concessionId'],
+          required: ['ticketId', 'validFrom'],
           properties: {
-            ticketId: { type: 'string', format: 'uuid' },
-            validFrom: { type: 'string', format: 'date-time' },
-            validTo: { type: 'string', format: 'date-time' },
-            concessionId: { type: 'integer' },
+            ticketId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'The ID of the ticket to purchase'
+            },
+            validFrom: {
+              type: 'string',
+              format: 'date-time',
+              description: 'The start date/time of ticket validity. The end date (validTo) will be automatically calculated based on the ticket duration.'
+            },
           },
         },
         PurchaseTicketResponse: {

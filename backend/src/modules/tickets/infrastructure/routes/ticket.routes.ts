@@ -13,6 +13,7 @@ router.get('/orders-history/:userId', (req, res) =>
 router.get('/:id', (req, res) => ticketController.getById(req, res));
 router.post('/', (req, res) => ticketController.create(req, res));
 router.post('/purchase', (req, res) => ticketController.purchase(req, res));
+router.post('/return/:ticketOrderId', (req, res) => ticketController.returnTicket(req, res));
 router.delete('/:id', (req, res) => ticketController.delete(req, res));
 
 export { router as ticketRoutes };
